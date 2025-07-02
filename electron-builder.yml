@@ -1,0 +1,9 @@
+appId: com.example.myapp
+productName: MyApp
+directories:
+  output: dist
+files:
+  - "**/*"
+win:
+  target:
+    - nsis

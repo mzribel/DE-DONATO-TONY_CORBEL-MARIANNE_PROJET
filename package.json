@@ -1,0 +1,39 @@
+{
+  "name": "pomodoro-app",
+  "productName": "Pomodoro App",
+  "version": "1.0.0",
+  "description": "App Pomodoro en VueJS + Electron, par Tony De Donato et Marianne Corbel :D",
+  "author": "Tony DE DONATO & Marianne CORBEL",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "build:main": "tsc -p tsconfig.main.json",
+    "dev:electron": "tsc -p tsconfig.main.json && electron dist-electron/main.js",
+    "dist": "npm run build && npm run build:main && electron-builder"
+  },
+  "main": "dist-electron/main.js",
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vue/tsconfig": "^0.7.0",
+    "electron": "^36.3.2",
+    "electron-builder": "^26.0.12",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "vue-tsc": "^2.2.8"
+  },
+  "build": {
+    "appId": "com.example.electronvueapp",
+    "productName": "Pomodoro App",
+    "files": [
+      "dist/**",
+      "dist-electron/**"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
