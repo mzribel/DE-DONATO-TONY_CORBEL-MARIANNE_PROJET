@@ -1,5 +1,7 @@
 import { app, BrowserWindow, ipcMain, Notification } from 'electron';
 import * as path from 'node:path';
+import 'reflect-metadata';
+import { initializeDatabase } from './database';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -13,7 +15,6 @@ async function createWindow() {
             nodeIntegration: false,
         },
     });
-
     mainWindow.setMenuBarVisibility(false);
 
     // Dév : npm run dev + npm run dev:electron
@@ -24,13 +25,16 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-    await createWindow();
+    await initializeDatabase()
+        .catch(err => console.error('Database initialization error:', err));    await createWindow();
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
         }
     });
+
+    app.setAppUserModelId("com.example.pomodoroapp")
 });
 
 app.on('window-all-closed', () => {

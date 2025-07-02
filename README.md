@@ -1,4 +1,4 @@
-# Vue 3 TS + Vite + Electron
+# Pomodoro App
 
 ## Dév
 
