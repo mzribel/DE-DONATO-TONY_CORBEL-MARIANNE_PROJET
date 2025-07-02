@@ -16,7 +16,11 @@ npm run dev:electron
 
 Il faut modifier le fichier `/electron/main.ts` :
 ```ts
-  mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    // Dév : npm run dev + npm run dev:electron
+    // await mainWindow.loadURL('http://localhost:5173');
+
+    // Prod : npm run dist
+    await mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
 ```
 
 Puis dans un terminal **en administrateur** :
