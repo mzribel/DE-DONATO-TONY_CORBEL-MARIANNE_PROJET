@@ -1,12 +1,12 @@
 import { supabase } from './client';
-import {type SettingsDTO } from '../../../types/settings';
+import {Settings} from "../../types/Settings";
 
-export async function getSettings(userId: string="06a29c38-1879-49f8-a54c-db4b829a2b4c"): Promise<SettingsDTO | null> {
+export async function getSettings(userId: string="06a29c38-1879-49f8-a54c-db4b829a2b4c"): Promise<Settings | null> {
     const { data, error } = await supabase
         .from('user_settings')
         .select('*')
         .eq('user_id', userId)
-        .maybeSingle<SettingsDTO>();
+        .maybeSingle<Settings>();
 
     if (error) {
         console.error(error);
@@ -19,7 +19,7 @@ export async function getSettings(userId: string="06a29c38-1879-49f8-a54c-db4b82
     return data;
 }
 
-export async function updateSettings(newSettings: Partial<SettingsDTO>, userId: string="06a29c38-1879-49f8-a54c-db4b829a2b4c"): Promise<SettingsDTO | null> {
+export async function updateSettings(newSettings: Partial<Settings>, userId: string="06a29c38-1879-49f8-a54c-db4b829a2b4c"): Promise<Settings | null> {
     const { data, error } = await supabase
         .from('user_settings')
         .update(newSettings)
@@ -32,10 +32,10 @@ export async function updateSettings(newSettings: Partial<SettingsDTO>, userId: 
         return null;
     }
 
-    return data as SettingsDTO;
+    return data as Settings;
 }
 
-async function createSettings(userId: string = "06a29c38-1879-49f8-a54c-db4b829a2b4c"): Promise<SettingsDTO | null> {
+async function createSettings(userId: string = "06a29c38-1879-49f8-a54c-db4b829a2b4c"): Promise<Settings | null> {
     const { data: createdData, error: insertError } = await supabase
         .from('user_settings')
         .upsert({
@@ -49,10 +49,10 @@ async function createSettings(userId: string = "06a29c38-1879-49f8-a54c-db4b829a
         return null;
     }
 
-    return createdData as SettingsDTO;
+    return createdData as Settings;
 }
 
-export async function resetSettings(userId: string = "06a29c38-1879-49f8-a54c-db4b829a2b4c"): Promise<SettingsDTO | null> {
+export async function resetSettings(userId: string = "06a29c38-1879-49f8-a54c-db4b829a2b4c"): Promise<Settings | null> {
     // Supprimer la ligne existante
     const { error: deleteError } = await supabase
         .from('user_settings')
@@ -64,5 +64,6 @@ export async function resetSettings(userId: string = "06a29c38-1879-49f8-a54c-db
         return null;
     }
 
+    // La recréer
     return createSettings(userId);
 }

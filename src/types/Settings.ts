@@ -1,4 +1,4 @@
-export interface SettingsDTO {
+export type Settings = {
     id: string,
     user_id:string,
     pomodoro_duration: number,

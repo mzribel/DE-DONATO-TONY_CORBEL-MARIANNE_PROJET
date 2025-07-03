@@ -16,7 +16,6 @@ async function createWindow() {
             nodeIntegration: false,
             sandbox: false,
         },
-        icon: path.join(__dirname, '../public/pomodoro-icon.svg')
     });
 
     mainWindow.setMenuBarVisibility(false);
@@ -29,10 +28,6 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-    // Base SQLite
-    // await initializeDatabase()
-    //     .catch(err => console.error('Database initialization error:', err));
-
     await createWindow();
 
     app.on('activate', () => {
@@ -40,8 +35,6 @@ app.whenReady().then(async () => {
             createWindow();
         }
     });
-
-    app.setAppUserModelId("com.example.pomodoroapp")
 });
 
 app.on('window-all-closed', () => {

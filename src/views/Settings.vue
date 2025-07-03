@@ -1,37 +1,20 @@
 <script setup lang="ts">
-import {ref, onMounted, inject} from 'vue';
-import {settingsService} from "../services/supabaseService.ts";
-import type {AuthState} from "../types";
+import {inject, onMounted, ref} from 'vue';
+import * as settingsService from "../services/supabase/settingsService";
+import type {AuthState} from "../types/AuthState";
 
 const authState = inject<{ value: AuthState }>('authState');
 
-const settings = ref({
-  pomodoroTime: 25,
-  shortBreakTime: 5,
-  longBreakTime: 15,
-  longBreakInterval: 4,
-  soundEnabled: true,
-  notificationsEnabled: true
-});
+const settings = ref(null);
 
 const isSaving = ref(false);
 const saveMessage = ref('');
 const saveError = ref('');
 
-
-
 onMounted(async () => {
   try {
     const userId = authState?.value?.user?.id;
-    const savedSettings = await settingsService.getSettings(userId);
-    settings.value = savedSettings || {
-      pomodoroTime: 25,
-      shortBreakTime: 5,
-      longBreakTime: 15,
-      longBreakInterval: 4,
-      soundEnabled: true,
-      notificationsEnabled: true
-    };
+    settings.value = await settingsService.getSettings(userId)
   } catch (error) {
     console.error('Failed to load settings:', error);
     saveError.value = 'Failed to load settings. Using defaults.';
@@ -46,7 +29,7 @@ const saveSettings = async () => {
   try {
 
     const userId = authState?.value?.user?.id;
-    await settingsService.saveSettings(userId, settings.value);
+    await settingsService.updateSettings(settings.value, userId);
     saveMessage.value = 'Settings saved successfully!';
 
     setTimeout(() => {
@@ -63,12 +46,12 @@ const saveSettings = async () => {
 // TODO : peut etre ajuster les valeurs par défaut (mais je crois que c'est ça)
 const resetToDefaults = () => {
   settings.value = {
-    pomodoroTime: 25,
-    shortBreakTime: 5,
-    longBreakTime: 15,
-    longBreakInterval: 4,
-    soundEnabled: true,
-    notificationsEnabled: true
+    pomodoro_time: 25,
+    short_break_time: 5,
+    long_break_time: 15,
+    cycles_before_long_break: 4,
+    // soundEnabled: true,
+    notifications_enabled: true
   };
 };
 </script>
@@ -86,7 +69,7 @@ const resetToDefaults = () => {
           <input 
             type="number" 
             id="pomodoro-time" 
-            v-model="settings.pomodoroTime" 
+            v-model="settings.pomodoro_time"
             min="1" 
             max="120"
             required
@@ -98,7 +81,7 @@ const resetToDefaults = () => {
           <input 
             type="number" 
             id="short-break-time" 
-            v-model="settings.shortBreakTime" 
+            v-model="settings.short_break_time"
             min="1" 
             max="30"
             required
@@ -110,7 +93,7 @@ const resetToDefaults = () => {
           <input 
             type="number" 
             id="long-break-time" 
-            v-model="settings.longBreakTime" 
+            v-model="settings.long_break_time"
             min="1" 
             max="60"
             required
@@ -124,8 +107,7 @@ const resetToDefaults = () => {
         <div class="form-group checkbox">
           <input 
             type="checkbox" 
-            id="sound-enabled" 
-            v-model="settings.soundEnabled"
+            id="sound-enabled"
           />
           <label for="sound-enabled">Enable Sound Alerts</label>
         </div>
@@ -134,7 +116,7 @@ const resetToDefaults = () => {
           <input 
             type="checkbox" 
             id="notifications-enabled" 
-            v-model="settings.notificationsEnabled"
+            v-model="settings.notifications_enabled"
           />
           <label for="notifications-enabled">Enable Desktop Notifications</label>
         </div>

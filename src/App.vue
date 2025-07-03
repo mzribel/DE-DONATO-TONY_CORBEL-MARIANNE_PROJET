@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, provide } from 'vue';
-import Header from './components/Header.vue';
-import PomodoroTimer from './components/PomodoroTimer.vue';
-import SessionHistory from './components/SessionHistory.vue';
-import Settings from './components/Settings.vue';
-import Auth from './components/Auth/Auth.vue';
-import { authService } from './services/supabaseService';
+import Header from './views/Header.vue';
+import PomodoroTimer from './views/PomodoroTimer.vue';
+import SessionHistory from './views/SessionHistory.vue';
+import Settings from './views/Settings.vue';
+import Auth from './views/Auth/Auth.vue';
+import * as authService from './services/supabase/authService';
 import type { Tab, User, AuthState } from "./types";
 
 const activeTab = ref<Tab>('timer');
@@ -24,17 +24,18 @@ const checkUser = async () => {
   isLoading.value = true;
 
   try {
-    const { data, error } = await authService.getSession();
+    const data = await authService.getSession();
 
-    if (error) {
-      console.error('Error checking auth status:', error);
-      return;
-    }
-
-    if (data?.session) {
-      authState.value.session = data.session;
-      authState.value.user = data.session.user as User;
-    }
+    // ???
+    // if (error) {
+    //   console.error('Error checking auth status:', error);
+    //   return;
+    // }
+    //
+    // if (data?.session) {
+    //   authState.value.session = data.session;
+    //   authState.value.user = data.session.user as User;
+    // }
   } catch (error) {
     console.error('Error checking auth status:', error);
   } finally {
@@ -43,14 +44,14 @@ const checkUser = async () => {
   }
 };
 
-// Set up auth state change listener
-authService.onAuthStateChange((event, session) => {
-  authState.value.session = session;
-  authState.value.user = session?.user as User || null;
-});
+// // Set up auth state change listener
+// authService.onAuthStateChange((event, session) => {
+//   authState.value.session = session;
+//   authState.value.user = session?.user as User || null;
+// });
 
 // Provide auth state to child components
-provide('authState', authState);
+// provide('authState', authState);
 
 onMounted(() => {
   checkUser();

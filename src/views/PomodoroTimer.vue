@@ -1,21 +1,16 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, inject } from 'vue';
-import type {TimerType, AuthState} from "../types";
-import {supabase} from "../lib/supabase.ts";
-import {settingsService} from "../services/supabaseService.ts";
+import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue';
+import type {AuthState } from "../types/AuthState";
+import type { TimerType } from "../types/TimerType";
+
+import * as settingsService from "../services/supabase/settingsService";
 
 const authState = inject<{ value: AuthState }>('authState');
 
 const timerType = ref<TimerType>('pomodoro');
 const isRunning = ref(false);
 const timeLeft = ref(0);
-const settings = ref({
-  pomodoroTime: 25,
-  shortBreakTime: 5,
-  longBreakTime: 15,
-  soundEnabled: true,
-  notificationsEnabled: true
-});
+const settings = ref(null);
 const completedPomodoros = ref(0);
 
 const formattedTime = computed(() => {
@@ -108,9 +103,9 @@ const setTimerDuration = () => {
 
 const getDurationForType = (type: TimerType): number => {
   switch (type) {
-    case 'pomodoro': return settings.value.pomodoroTime;
-    case 'shortBreak': return settings.value.shortBreakTime;
-    case 'longBreak': return settings.value.longBreakTime;
+    case 'pomodoro': return settings.value.pomodoro_duration;
+    case 'shortBreak': return settings.value.short_break_duration;
+    case 'longBreak': return settings.value.long_break_duration;
   }
 };
 
@@ -127,9 +122,8 @@ const changeTimerType = (type: TimerType) => {
 
 onMounted(async () => {
   try {
-    const userId = authState?.value?.user?.id;
-    const savedSettings = await settingsService.getSettings(userId)
-    settings.value = savedSettings;
+    // const userId = authState?.value?.user?.id;
+    settings.value = await settingsService.getSettings();
   } catch (error) {
     console.error('Failed to load settings:', error);
   }

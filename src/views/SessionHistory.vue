@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, inject } from 'vue';
-import { Bar } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
-import type {Session, AuthState} from "../types";
-import {sessionService} from "../services/supabaseService.ts";
+import {computed, inject, onMounted, ref} from 'vue';
+import {Bar} from 'vue-chartjs';
+import {BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip} from 'chart.js';
+import type {AuthState } from "../types/AuthState";
+import type {Session } from "../types/Session";
+import * as sessionService from "../services/supabase/sessionService";
 
 const authState = inject<{ value: AuthState }>('authState');
 
@@ -102,8 +103,7 @@ const loadSessions = async () => {
 
   try {
     const userId = authState?.value?.user?.id;
-    const data = await sessionService.getSessions(userId)
-    sessions.value = data;
+    sessions.value = await sessionService.getSessions(userId);
   } catch (err) {
     console.error('Failed to load sessions:', err);
     error.value = 'Failed to load session history. Please try again.';

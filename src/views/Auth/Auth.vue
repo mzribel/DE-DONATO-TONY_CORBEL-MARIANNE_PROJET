@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import type { AuthState } from '../../types';
-import { authService } from '../../services/supabaseService';
+import type { AuthState } from '../../types/AuthState';
+import * as authService from '../../services/supabase/authService';
 import Login from './Login.vue';
 import Signup from './Signup.vue';
 import Profile from './Profile.vue';
@@ -74,7 +74,7 @@ const handleLogin = async (email: string, password: string) => {
 
 const handleSignup = async (email: string, password: string) => {
   try {
-    const { data, error } = await authService.signUp(email, password);
+    const { data, error } = await authService.signUpWithEmail(email, password);
 
     if (error) throw error;
 

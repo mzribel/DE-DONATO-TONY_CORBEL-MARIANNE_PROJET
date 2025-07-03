@@ -1,22 +1,24 @@
 import { ref } from "vue";
-import {SettingsDTO} from "../../types/settings";
 
 const settings = ref(null);
 const loading = ref(false);
 
+import * as SettingsService from "../services/supabase/settingsService"
+import {Settings} from "../types/Settings";
+
 export function useSettings() {
     async function loadSettings():Promise<void> {
         loading.value = true;
-        settings.value = await window.electronAPI.getSettings();
+        settings.value = await SettingsService.getSettings();
         loading.value = false;
     }
 
-    async function updateSettings(newSettings:Partial<SettingsDTO>):Promise<void> {
-        settings.value = await window.electronAPI.updateSettings(newSettings);
+    async function updateSettings(newSettings:Partial<Settings>):Promise<void> {
+        settings.value = await SettingsService.updateSettings(newSettings);
     }
 
     async function resetSettings():Promise<void> {
-        settings.value = await window.electronAPI.resetSettings();
+        settings.value = await SettingsService.resetSettings();
     }
 
     return {

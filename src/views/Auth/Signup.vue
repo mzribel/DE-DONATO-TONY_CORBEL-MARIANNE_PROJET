@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { authService } from '../../services/supabaseService';
+import * as authService from '../../services/supabase/authService';
 
 const emit = defineEmits<{
   (e: 'signup', email: string, password: string): void;
@@ -36,20 +36,20 @@ const handleSubmit = async () => {
   isLoading.value = true;
 
   try {
-    const { data, error } = await authService.signUp(email.value, password.value);
+    const data = await authService.signUpWithEmail(email.value, password.value);
 
-    if (error) {
-      errorMessage.value = error.message || 'Signup failed. Please try again.';
-    } else {
-      if (data.user && !data.session) {
-        successMessage.value = 'Check your email for confirmation link';
-      }
-
+    // if (error) {
+    //   errorMessage.value = error.message || 'Signup failed. Please try again.';
+    // } else {
+    //   if (data.user && !data.session) {
+    //     successMessage.value = 'Check your email for confirmation link';
+    //   }
+    //
 
       email.value = '';
       password.value = '';
       confirmPassword.value = '';
-    }
+    // }
   } catch (error: any) {
     errorMessage.value = error.message || 'An unexpected error occurred';
   } finally {

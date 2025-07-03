@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Tab } from '../types';
+import type { Tab } from '../types/Tab';
 
 const props = defineProps<{
   activeTab: Tab,

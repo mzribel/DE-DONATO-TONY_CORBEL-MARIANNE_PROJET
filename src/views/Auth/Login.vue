@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { authService } from '../../services/supabaseService';
+import * as authService from '../../services/supabase/authService';
 
 const emit = defineEmits<{
   (e: 'login', email: string, password: string): void;
@@ -22,7 +22,7 @@ const handleSubmit = async () => {
   errorMessage.value = '';
 
   try {
-    const { data, error } = await authService.signIn(email.value, password.value);
+    const { data, error } = await authService.signInWithEmail(email.value, password.value);
 
     if (error) {
       errorMessage.value = error.message || 'Login failed. Please try again.';
