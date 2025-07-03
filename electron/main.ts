@@ -1,5 +1,7 @@
 import { app, BrowserWindow, ipcMain, Notification } from 'electron';
 import * as path from 'node:path';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -11,6 +13,7 @@ async function createWindow() {
             preload: path.join(__dirname, 'preload.js'), // Utilise le preload sécurisé
             contextIsolation: true,
             nodeIntegration: false,
+            sandbox: false,
         },
     });
 

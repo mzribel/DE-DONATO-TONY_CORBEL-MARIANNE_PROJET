@@ -1,30 +1,52 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { ref, onMounted } from 'vue';
+import { getSession, onAuthStateChange } from './services/supabase/authService';
+
+const isAuthenticated = ref(false);
+
+onMounted(async () => {
+  const data = await getSession();
+  isAuthenticated.value = !!data?.session;
+});
+
+onAuthStateChange((event, session) => {
+  isAuthenticated.value = !!session;
+});
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+  <nav>
+    <RouterLink to="/">Home</RouterLink>
+
+    <template v-if="isAuthenticated">
+      <RouterLink to="/settings">Settings</RouterLink>
+      <RouterLink to="/pomodoro">Pomodoro</RouterLink>
+      <RouterLink to="/history">History</RouterLink>
+      <RouterLink to="/profile">Profile</RouterLink>
+    </template>
+    <template v-else>
+      <RouterLink to="/login">Login</RouterLink>
+      <RouterLink to="/signup">Signup</RouterLink>
+    </template>
+  </nav>
+  <RouterView></RouterView>
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+nav {
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+a {
+  color: #4a6fa5;
+  text-decoration: none;
+  font-weight: 500;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+a.router-link-active {
+  color: #3a5a8c;
+  font-weight: 700;
 }
 </style>

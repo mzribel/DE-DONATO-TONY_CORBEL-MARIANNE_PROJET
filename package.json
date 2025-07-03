@@ -9,12 +9,17 @@
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "build:main": "tsc -p tsconfig.main.json",
+    "start:electron": "electron .",
     "dev:electron": "tsc -p tsconfig.main.json && electron dist-electron/main.js",
     "dist": "npm run build && npm run build:main && electron-builder"
   },
   "main": "dist-electron/main.js",
   "dependencies": {
-    "vue": "^3.5.13"
+    "@supabase/supabase-js": "^2.50.3",
+    "chart.js": "^4.4.1",
+    "vue": "^3.5.13",
+    "vue-chartjs": "^5.3.2",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
@@ -26,7 +31,7 @@
     "vue-tsc": "^2.2.8"
   },
   "build": {
-    "appId": "com.example.electronvueapp",
+    "appId": "com.example.pomodoroapp",
     "productName": "Pomodoro App",
     "files": [
       "dist/**",
