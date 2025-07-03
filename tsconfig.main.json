@@ -4,6 +4,7 @@
         "experimentalDecorators": true,
         "module": "CommonJS",
         "outDir": "dist-electron",
+        "rootDir": "electron",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,

@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import type {SettingsDTO} from "../../../types/settings.ts";
 
 @Entity()
 export class Settings {
@@ -22,4 +23,16 @@ export class Settings {
 
     @Column({ type:"boolean", default: false, nullable: false, name:  "auto_start_next" })
     autoStartNext!: boolean;
+
+    toDto(): SettingsDTO {
+        return {
+            id: this.id,
+            pomodoroDuration: this.pomodoroDuration,
+            shortBreakDuration: this.shortBreakDuration,
+            longBreakDuration: this.longBreakDuration,
+            cyclesBeforeLongBreak: this.cyclesBeforeLongBreak,
+            notificationsEnabled: this.notificationsEnabled,
+            autoStartNext: this.autoStartNext,
+        };
+    }
 }

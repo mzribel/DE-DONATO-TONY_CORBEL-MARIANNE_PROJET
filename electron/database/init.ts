@@ -7,7 +7,7 @@ export async function initSettings(datasource: DataSource) {
 
     const count = await settingsRepo.count();
     if (!count) {
-        const defautSettings = await settingsRepo.create({
+        const defautSettings = settingsRepo.create({
             pomodoroDuration: DEFAULT_SETTINGS.pomodoroDuration,
             shortBreakDuration: DEFAULT_SETTINGS.shortBreakDuration,
             longBreakDuration: DEFAULT_SETTINGS.longBreakDuration,

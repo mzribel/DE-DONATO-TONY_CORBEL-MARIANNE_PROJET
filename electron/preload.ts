@@ -1,5 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import type {SettingsDTO} from "../types/settings.ts";
+import * as settingsService from "./services/settingsService"; // chemin correct car /electron/preload.ts
 
+// import * as settingsService from "./services/settingsService";
+// import type {SettingsDTO} from "../types/settings.ts";
 /**
  * PRELOAD
  * ----------
@@ -15,4 +19,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('electronAPI', {
     // Notifications
     notify: (title: string, body: string) => ipcRenderer.invoke('notify', { title, body }),
+    getSettings: () => settingsService.getSettings(),
+    updateSettings: (newSettings:Partial<SettingsDTO>) => settingsService.updateSettings(newSettings),
+    resetSettings: () => settingsService.resetSettings(),
 });
