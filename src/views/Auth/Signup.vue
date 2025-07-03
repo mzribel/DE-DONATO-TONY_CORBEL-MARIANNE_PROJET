@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { ref } from 'vue';
+<script lang="ts" setup>
+import {ref} from 'vue';
 import * as authService from '../../services/supabase/authService';
 
 const emit = defineEmits<{
@@ -38,18 +38,15 @@ const handleSubmit = async () => {
   try {
     const data = await authService.signUpWithEmail(email.value, password.value);
 
-    // if (error) {
-    //   errorMessage.value = error.message || 'Signup failed. Please try again.';
-    // } else {
-    //   if (data.user && !data.session) {
-    //     successMessage.value = 'Check your email for confirmation link';
-    //   }
-    //
+    if (data) {
+      if (data.user && !data.session) {
+        successMessage.value = 'Successfully signed up.';
+      }
 
       email.value = '';
       password.value = '';
       confirmPassword.value = '';
-    // }
+    }
   } catch (error: any) {
     errorMessage.value = error.message || 'An unexpected error occurred';
   } finally {
@@ -66,37 +63,37 @@ const goToLogin = () => {
   <div class="signup-container">
     <h2>Create Account</h2>
 
-    <form @submit.prevent="handleSubmit" class="signup-form">
+    <form class="signup-form" @submit.prevent="handleSubmit">
       <div class="form-group">
         <label for="email">Email</label>
-        <input 
-          id="email"
-          type="email" 
-          v-model="email" 
-          placeholder="Enter your email"
-          required
+        <input
+            id="email"
+            v-model="email"
+            placeholder="Enter your email"
+            required
+            type="email"
         />
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
-        <input 
-          id="password"
-          type="password" 
-          v-model="password" 
-          placeholder="Create a password"
-          required
+        <input
+            id="password"
+            v-model="password"
+            placeholder="Create a password"
+            required
+            type="password"
         />
       </div>
 
       <div class="form-group">
         <label for="confirm-password">Confirm Password</label>
-        <input 
-          id="confirm-password"
-          type="password" 
-          v-model="confirmPassword" 
-          placeholder="Confirm your password"
-          required
+        <input
+            id="confirm-password"
+            v-model="confirmPassword"
+            placeholder="Confirm your password"
+            required
+            type="password"
         />
       </div>
 
@@ -108,18 +105,18 @@ const goToLogin = () => {
         {{ successMessage }}
       </div>
 
-      <button 
-        type="submit" 
-        class="signup-button"
-        :disabled="isLoading"
+      <button
+          :disabled="isLoading"
+          class="signup-button"
+          type="submit"
       >
         {{ isLoading ? 'Creating account...' : 'Sign Up' }}
       </button>
     </form>
 
     <div class="login-link">
-      Already have an account? 
-      <button @click="goToLogin" class="text-button">Log in</button>
+      Already have an account?
+      <button class="text-button" @click="goToLogin">Log in</button>
     </div>
   </div>
 </template>

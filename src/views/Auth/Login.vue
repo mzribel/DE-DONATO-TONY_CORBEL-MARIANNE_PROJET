@@ -22,13 +22,12 @@ const handleSubmit = async () => {
   errorMessage.value = '';
 
   try {
-    const { data, error } = await authService.signInWithEmail(email.value, password.value);
+    const data = await authService.signInWithEmail(email.value, password.value);
 
-    if (error) {
-      errorMessage.value = error.message || 'Login failed. Please try again.';
-    } else {
+    if (data) {
       emit('login', email.value, password.value);
     }
+
   } catch (error: any) {
     errorMessage.value = error.message || 'An unexpected error occurred';
   } finally {

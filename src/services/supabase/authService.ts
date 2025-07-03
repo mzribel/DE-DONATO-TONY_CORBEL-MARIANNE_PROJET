@@ -1,4 +1,6 @@
 import { supabase } from './client';
+import {Session} from "../../types/Session";
+import {AuthSession} from "@supabase/supabase-js";
 
 export async function signInWithEmail(email: string, password: string) {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -26,11 +28,11 @@ export async function signOut() {
 export async function getSession() {
     const { data, error } = await supabase.auth.getSession();
     if (error) console.error(error);
-    return data.session;
+    return data;
 }
 
-// export function onAuthStateChange(callback: (event: string, session: Session | null) => void) {
-//     return supabase.auth.onAuthStateChange((event, session) => {
-//         callback(event, session);
-//     });
-// }
+export function onAuthStateChange(callback: (event: string, session: AuthSession | null) => void) {
+    return supabase.auth.onAuthStateChange((event, session) => {
+        callback(event, session);
+    });
+}

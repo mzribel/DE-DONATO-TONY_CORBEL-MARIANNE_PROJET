@@ -24,11 +24,8 @@ const checkUser = async () => {
   authState.value.loading = true;
 
   try {
-    const { data, error } = await authService.getSession();
+    const data = await authService.getSession();
 
-    if (error) {
-      throw error;
-    }
 
     if (data?.session) {
       authState.value.session = data.session;
@@ -53,9 +50,7 @@ const checkUser = async () => {
 
 const handleLogin = async (email: string, password: string) => {
   try {
-    const { data, error } = await authService.signIn(email, password);
-
-    if (error) throw error;
+    const data = await authService.signInWithEmail(email, password);
 
     authState.value.session = data.session;
     authState.value.user = data.user
@@ -74,9 +69,7 @@ const handleLogin = async (email: string, password: string) => {
 
 const handleSignup = async (email: string, password: string) => {
   try {
-    const { data, error } = await authService.signUpWithEmail(email, password);
-
-    if (error) throw error;
+    const data = await authService.signUpWithEmail(email, password);
 
     if (data.user && !data.session) {
       return { message: 'No session returned' };
@@ -98,11 +91,9 @@ const handleSignup = async (email: string, password: string) => {
   }
 };
 
-// Handle logout
 const handleLogout = async () => {
   try {
-    const { error } = await authService.signOut();
-    if (error) throw error;
+    await authService.signOut();
 
     authState.value.user = null;
     authState.value.session = null;
@@ -116,7 +107,13 @@ checkUser();
 
 authService.onAuthStateChange((event, session) => {
   authState.value.session = session;
-  authState.value.user = session?.user || null;
+  authState.value.user = session?.user
+      ? {
+        id: session.user.id,
+        email: session.user.email,
+        created_at: session.user.created_at ?? ''
+      }
+      : null;
 });
 
 const isAuthenticated = computed(() => !!authState.value.user);
