@@ -3,8 +3,6 @@ import * as settingsService from "./services/supabase/settingsService"; // chemi
 import * as authService from "./services/supabase/authService";
 import type {SettingsDTO} from "../types/settings.ts";
 
-// import * as settingsService from "./services/settingsService";
-// import type {SettingsDTO} from "../types/settings.ts";
 /**
  * PRELOAD
  * ----------
@@ -25,4 +23,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     resetSettings:(userId: string) => settingsService.resetSettings(userId),
     signIn: (email: string, password: string) => authService.signInWithEmail(email, password),
     getCurrentUser: () => authService.getCurrentUser(),
+
+    // Database operations
+    saveSession: (sessionData: any) => ipcRenderer.invoke('db:saveSession', sessionData),
+    getSessions: (userId?: string) => ipcRenderer.invoke('db:getSessions', userId),
 });

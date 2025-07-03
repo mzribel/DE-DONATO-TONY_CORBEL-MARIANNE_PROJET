@@ -1,5 +1,3 @@
-import {SettingsDTO} from "../types/settings";
-
 export {};
 
 declare global {
@@ -9,6 +7,11 @@ declare global {
             getSettings: () => Promise<SettingsDTO>,
             updateSettings: (newSettings: Partial<SettingsDTO>) => Promise<SettingsDTO>,
             resetSettings: () => Promise<SettingsDTO>
+
+            // Historique des sessions
+            saveSession: (sessionData: any) => Promise<void>;
+            getSessions: (userId: any) => Promise<any[]>;
+
         };
     }
 }

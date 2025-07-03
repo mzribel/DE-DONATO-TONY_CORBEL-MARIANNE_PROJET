@@ -16,7 +16,9 @@ async function createWindow() {
             nodeIntegration: false,
             sandbox: false,
         },
+        icon: path.join(__dirname, '../public/pomodoro-icon.svg')
     });
+
     mainWindow.setMenuBarVisibility(false);
 
     // Dév : npm run dev + npm run dev:electron
