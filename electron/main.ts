@@ -1,7 +1,8 @@
 import { app, BrowserWindow, ipcMain, Notification } from 'electron';
 import * as path from 'node:path';
 import 'reflect-metadata';
-import { initializeDatabase } from './database';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -13,6 +14,7 @@ async function createWindow() {
             preload: path.join(__dirname, 'preload.js'), // Utilise le preload sécurisé
             contextIsolation: true,
             nodeIntegration: false,
+            sandbox: false,
         },
     });
     mainWindow.setMenuBarVisibility(false);
@@ -25,8 +27,11 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-    await initializeDatabase()
-        .catch(err => console.error('Database initialization error:', err));    await createWindow();
+    // Base SQLite
+    // await initializeDatabase()
+    //     .catch(err => console.error('Database initialization error:', err));
+
+    await createWindow();
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
