@@ -1,10 +1,9 @@
 import { ref } from "vue";
+import * as SettingsService from "../services/supabase/settingsService"
+import { Settings } from "../types/Settings";
 
 const settings = ref(null);
 const loading = ref(false);
-
-import * as SettingsService from "../services/supabase/settingsService"
-import {Settings} from "../types/Settings";
 
 export function useSettings() {
     async function loadSettings():Promise<void> {

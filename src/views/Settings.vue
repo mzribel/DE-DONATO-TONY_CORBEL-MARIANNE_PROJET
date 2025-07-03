@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {inject, onMounted, ref} from 'vue';
+import { inject, onMounted, ref } from 'vue';
 import * as settingsService from "../services/supabase/settingsService";
-import type {AuthState} from "../types/AuthState";
+import type { AuthState } from "../types/AuthState";
 
 const authState = inject<{ value: AuthState }>('authState');
 
@@ -50,7 +50,7 @@ const resetToDefaults = () => {
     short_break_time: 5,
     long_break_time: 15,
     cycles_before_long_break: 4,
-    // soundEnabled: true,
+    sound_enabled: true,
     notifications_enabled: true
   };
 };

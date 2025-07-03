@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { getSession, onAuthStateChange } from './services/supabase/authService';
-
 const isAuthenticated = ref(false);
 
 onMounted(async () => {
@@ -29,7 +28,9 @@ onAuthStateChange((event, session) => {
       <RouterLink to="/signup">Signup</RouterLink>
     </template>
   </nav>
-  <RouterView></RouterView>
+  <div id="content">
+    <RouterView></RouterView>
+  </div>
 </template>
 
 <style scoped>
@@ -48,5 +49,8 @@ a {
 a.router-link-active {
   color: #3a5a8c;
   font-weight: 700;
+}
+#content {
+  padding: 20px;
 }
 </style>

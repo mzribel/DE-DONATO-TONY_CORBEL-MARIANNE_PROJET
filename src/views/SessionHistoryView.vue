@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {computed, inject, onMounted, ref} from 'vue';
-import {Bar} from 'vue-chartjs';
-import {BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip} from 'chart.js';
-import type {AuthState } from "../types/AuthState";
-import type {Session } from "../types/Session";
+import { computed, inject, onMounted, ref } from 'vue';
+import { Bar } from 'vue-chartjs';
+import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
+import type { AuthState } from "../types/AuthState";
+import type { Session } from "../types/Session";
 import * as sessionService from "../services/supabase/sessionService";
 
 const authState = inject<{ value: AuthState }>('authState');

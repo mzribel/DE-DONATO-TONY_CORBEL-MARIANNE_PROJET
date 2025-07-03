@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue';
-import type {AuthState } from "../types/AuthState";
+import {computed, inject, onMounted, onUnmounted, ref, watch } from 'vue';
+import type { AuthState } from "../types/AuthState";
 import type { TimerType } from "../types/TimerType";
 
 import * as settingsService from "../services/supabase/settingsService";

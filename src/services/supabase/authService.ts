@@ -1,6 +1,5 @@
 import { supabase } from './client';
-import {Session} from "../../types/Session";
-import {AuthSession} from "@supabase/supabase-js";
+import { AuthSession } from "@supabase/supabase-js";
 
 export async function signInWithEmail(email: string, password: string) {
     const { data, error } = await supabase.auth.signInWithPassword({

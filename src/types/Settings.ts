@@ -6,5 +6,6 @@ export type Settings = {
     long_break_duration: number,
     cycles_before_long_break: number,
     notifications_enabled: boolean,
+    sound_enabled: boolean,
     auto_start_next: boolean
 }

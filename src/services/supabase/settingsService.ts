@@ -1,5 +1,5 @@
 import { supabase } from './client';
-import {Settings} from "../../types/Settings";
+import { Settings } from "../../types/Settings";
 
 export async function getSettings(userId: string="06a29c38-1879-49f8-a54c-db4b829a2b4c"): Promise<Settings | null> {
     const { data, error } = await supabase
