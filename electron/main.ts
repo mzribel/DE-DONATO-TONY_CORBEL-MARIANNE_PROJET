@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain, Notification } from 'electron';
 import * as path from 'node:path';
-import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
