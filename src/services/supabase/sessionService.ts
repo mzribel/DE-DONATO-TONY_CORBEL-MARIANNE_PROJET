@@ -1,6 +1,6 @@
 import {Session} from "../../types/Session";
 
-export async function saveSession(sessionData?: Session) {
+export async function saveSession(sessionData?: Partial<Session>) {
     // TODO:
 }
 

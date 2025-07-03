@@ -8,7 +8,6 @@ const sendNotification = () => {
 
 <template>
   <h1>Home</h1>
-
   <div class="card">
     <button type="button" @click="sendNotification">Send a notification !</button>
     <p>Ctrl+maj+i pour ouvrir la console !</p>
@@ -16,7 +15,4 @@ const sendNotification = () => {
 </template>
 
 <style scoped>
-.read-the-docs {
-  color: #888;
-}
 </style>

@@ -4,6 +4,7 @@ import type {AuthState } from "../types/AuthState";
 import type { TimerType } from "../types/TimerType";
 
 import * as settingsService from "../services/supabase/settingsService";
+import * as sessionService from "../services/supabase/sessionService"
 
 const authState = inject<{ value: AuthState }>('authState');
 
@@ -80,7 +81,7 @@ const completeTimer = () => {
     endTime: new Date().toISOString(),
     userId: authState?.value?.user?.id
   };
-  window.electronAPI.saveSession(sessionData);
+  sessionService.saveSession(sessionData);
 
   if (timerType.value === 'pomodoro') {
     completedPomodoros.value++;
