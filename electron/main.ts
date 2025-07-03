@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import { app, BrowserWindow, ipcMain, Notification, globalShortcut } from 'electron';
 import * as path from 'node:path';
+import { sessionService, settingsService } from '../src/services/supabaseService';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -12,6 +13,7 @@ async function createWindow() {
             contextIsolation: true,
             nodeIntegration: false,
         },
+        icon: path.join(__dirname, '../public/pomodoro-icon.svg')
     });
 
     mainWindow.setMenuBarVisibility(false);

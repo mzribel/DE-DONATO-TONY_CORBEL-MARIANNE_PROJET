@@ -15,4 +15,13 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('electronAPI', {
     // Notifications
     notify: (title: string, body: string) => ipcRenderer.invoke('notify', { title, body }),
+
+    // Database operations
+    saveSession: (sessionData: any) => ipcRenderer.invoke('db:saveSession', sessionData),
+    getSessions: (userId?: string) => ipcRenderer.invoke('db:getSessions', userId),
+
+    // User preferences
+    saveSettings: (userId: string, settings: any) => ipcRenderer.invoke('store:saveSettings', { userId, settings }),
+    getSettings: (userId?: string) => ipcRenderer.invoke('store:getSettings', userId),
+
 });
