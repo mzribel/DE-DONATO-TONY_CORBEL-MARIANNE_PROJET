@@ -1,30 +1,28 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { getSession } from '../services/supabase/authService';
 
-import HomeView from "../views/HomeView.vue";
 import SettingsView from "../views/SettingsView.vue";
-import PomodoroTimerView from "../views/PomodoroTimerView.vue";
-import SessionHistoryView from "../views/SessionHistoryView.vue";
+import HistoryView from "../views/HistoryView.vue";
 import Auth from "../views/Auth/Auth.vue";
+import TimerView from "../views/TimerView.vue";
 
 const routes = [
-    { path: '/', name: "Home", component: HomeView },
-    { 
+    {
         path: '/settings', 
         name: "Settings", 
         component: SettingsView,
         meta: { requiresAuth: true }
     },
     { 
-        path: '/pomodoro', 
+        path: '/',
         name: "Pomodoro", 
-        component: PomodoroTimerView,
+        component: TimerView,
         meta: { requiresAuth: true }
     },
     { 
         path: '/history', 
         name: "History", 
-        component: SessionHistoryView,
+        component: HistoryView,
         meta: { requiresAuth: true }
     },
     { 

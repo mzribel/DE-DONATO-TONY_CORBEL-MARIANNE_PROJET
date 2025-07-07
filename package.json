@@ -18,6 +18,7 @@
     "@primeuix/themes": "^1.2.1",
     "@supabase/supabase-js": "^2.50.3",
     "chart.js": "^4.4.1",
+    "node-notifier": "^10.0.1",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.6",
     "vue": "^3.5.13",
@@ -25,6 +26,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@types/node-notifier": "^8.0.5",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
     "electron": "^36.3.2",

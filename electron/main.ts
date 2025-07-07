@@ -1,4 +1,5 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
+import notifier from 'node-notifier';
 import * as path from 'node:path';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -44,7 +45,12 @@ app.on('window-all-closed', () => {
     }
 });
 
-// IPC Notifications
+
 ipcMain.handle('notify', (_, { title, body }: { title: string; body: string }) => {
-    new Notification({ title, body }).show();
+    notifier.notify({
+        title,
+        message: body,
+        sound: false, // essaie de couper le son si supporté
+        icon: path.join(__dirname, '..', 'public', 'mariannepray.ico'), // chemin absolu ou relatif correct
+    });
 });

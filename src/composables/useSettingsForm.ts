@@ -27,11 +27,11 @@ export function useSettingsForm() {
         return JSON.stringify(settings.value) !== JSON.stringify(localSettings.value);
     });
 
-    async function saveChanges() {
+    async function saveChanges(userId:string) {
         if (!localSettings.value) return;
         saving.value = true;
         try {
-            await updateSettings(localSettings.value);
+            await updateSettings(localSettings.value, userId);
         } catch (error) {
             console.error("Erreur lors de la sauvegarde :", error);
         } finally {

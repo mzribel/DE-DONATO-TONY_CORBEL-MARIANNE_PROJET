@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue';
+import {computed, inject, onMounted, ref} from 'vue';
 import { useSettingsForm } from '../composables/useSettingsForm';
 
 import InputNumber from 'primevue/inputnumber';
@@ -25,10 +25,11 @@ const {
 } = useSettingsForm();
 
 onMounted(() => {
-  loadSettings();
+  loadSettings(userId);
 });
 
 const showConfirm = ref(false);
+const userId:string = inject("userId")
 
 const enableNotifications = computed(() => settings.value?.notifications_enabled ?? false);
 const { sendNotification } = useNotifications(enableNotifications);
@@ -44,7 +45,7 @@ const playTestSound = () => {
 </script>
 
 <template>
-  <ConfirmDialog v-model="showConfirm" @confirm="resetSettings"/>
+  <ConfirmDialog v-model="showConfirm" @confirm="resetSettings(userId)"/>
     <div class="flex justify-between">
       <h1>Settings</h1>
       <Button @click="showConfirm=true" size="small" variant="outlined" severity="danger" v-if="settings">Reset settings</Button>
@@ -110,7 +111,7 @@ const playTestSound = () => {
 
       <div class="button-bar">
         <Button icon="pi pi-times" label="Cancel" @click="cancelChanges" severity="secondary" />
-        <Button icon="pi pi-check" label="Save" @click="saveChanges" :disabled="!hasChanged" :loading="saving"/>
+        <Button icon="pi pi-check" label="Save" @click="saveChanges(userId)" :disabled="!hasChanged" :loading="saving"/>
       </div>
     </div>
 </template>
