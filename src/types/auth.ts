@@ -1,4 +1,4 @@
-import { User } from "./User";
+import { User } from "./users";
 
 export type AuthState = {
     user: User | null;

@@ -50,12 +50,10 @@ const playTestSound = () => {
       <h1>Settings</h1>
       <Button @click="showConfirm=true" size="small" variant="outlined" severity="danger" v-if="settings">Reset settings</Button>
     </div>
-    <div v-if="loading">
-      <ProgressSpinner />
+    <div v-if="loading" class="flex flex-1 align-center justify-between">
+      <ProgressSpinner style="width: 75px; height: 75px" strokeWidth="3" fill="transparent" />
     </div>
     <div v-else-if="settings" class="flex col row-gap-16">
-      <div class="button-bar">
-      </div>
       <FieldSet>
         <template #legend>
           <h2>Timer</h2>
@@ -116,24 +114,8 @@ const playTestSound = () => {
     </div>
 </template>
 
-<style scoped>
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+<style>
 
-.form-element {
-  display: flex;
-}
-.form-element.horizontal {
-  flex-direction: row;
-  gap: 8px;
-}
-.form-element.vertical {
-  flex-direction: column;
-  gap: 4px;
-}
 
 .button-bar {
   display: flex;
@@ -144,5 +126,9 @@ const playTestSound = () => {
 
 h1, h2{
   margin: 0;
+}
+
+.p-progressspinner-circle {
+  animation: p-progressspinner-dash 1.5s ease-in-out infinite !important;
 }
 </style>

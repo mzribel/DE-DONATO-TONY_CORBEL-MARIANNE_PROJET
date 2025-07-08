@@ -1,9 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import notifier from 'node-notifier';
 import * as path from 'node:path';
-import * as dotenv from 'dotenv';
-dotenv.config();
-
 let mainWindow: BrowserWindow | null = null;
 
 async function createWindow() {

@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import * as authService from '../../services/supabase/authService';
+import Button from "primevue/button"
+import InputText from "primevue/inputtext"
+import Panel from "primevue/panel"
+import {useRouter} from "vue-router";
 
-const emit = defineEmits<{
-  (e: 'signup', email: string, password: string): void;
-  (e: 'go-to-login'): void;
-}>();
+const router = useRouter();
 
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+
 const errorMessage = ref('');
 const successMessage = ref('');
 const isLoading = ref(false);
@@ -29,7 +31,7 @@ const handleSubmit = async () => {
   }
 
   if (password.value.length < 6) {
-    errorMessage.value = 'Password must be at least 6 characters long';
+    errorMessage.value = 'Password must be at least 6 characters';
     return;
   }
 
@@ -38,14 +40,15 @@ const handleSubmit = async () => {
   try {
     const data = await authService.signUpWithEmail(email.value, password.value);
 
-    if (data) {
-      if (data.user && !data.session) {
-        successMessage.value = 'Successfully signed up.';
-      }
+    if (data?.user && !data.session) {
+      successMessage.value = 'Account created! Please check your email to confirm your address.';
+      // Optionally redirect after delay:
+      setTimeout(() => router.push('/login'), 3000);
+      return;
+    }
 
-      email.value = '';
-      password.value = '';
-      confirmPassword.value = '';
+    if (data?.session) {
+      await router.push('/');
     }
   } catch (error: any) {
     errorMessage.value = error.message || 'An unexpected error occurred';
@@ -54,130 +57,94 @@ const handleSubmit = async () => {
   }
 };
 
-const goToLogin = () => {
-  emit('go-to-login');
+const handleSignup = async (email: string, password: string) => {
+  try {
+    const data = await authService.signUpWithEmail(email, password);
+
+    if (data.user && !data.session) {
+      return { message: 'No session returned' };
+    }
+
+    authState.value.session = data.session;
+    authState.value.user = data.user
+      ? {
+        id: data.user.id,
+        email: typeof data.user.email === 'string' ? data.user.email : '',
+        created_at: (data.user as any).created_at ?? ''
+      }
+      : null;
+
+    await router.push("/")
+  } catch (error) {
+    console.error('Error signing up:', error);
+    return { error };
+  }
 };
+
 </script>
 
 <template>
-  <div class="signup-container">
-    <h2>Create Account</h2>
+  <Panel class="auth-form">
+    <template #header>
+      <h1>Create Account</h1>
+    </template>
 
-    <form class="signup-form" @submit.prevent="handleSubmit">
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
+    <form class="flex col row-gap-24" @submit.prevent="handleSubmit">
+      <div class="form-group flex col row-gap-8">
+        <div class="form-element vertical">
+          <label for="email">Email</label>
+          <InputText
             id="email"
             v-model="email"
             placeholder="Enter your email"
             required
             type="email"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
+          />
+        </div>
+        <div class="form-element vertical">
+          <label for="password">Password</label>
+          <InputText
             id="password"
             v-model="password"
             placeholder="Create a password"
             required
             type="password"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="confirm-password">Confirm Password</label>
-        <input
+          />
+        </div>
+        <div class="form-element vertical">
+          <label for="confirm-password">Confirm Password</label>
+          <InputText
             id="confirm-password"
             v-model="confirmPassword"
             placeholder="Confirm your password"
             required
             type="password"
-        />
+          />
+        </div>
       </div>
 
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
-
       <div v-if="successMessage" class="success-message">
         {{ successMessage }}
       </div>
 
-      <button
-          :disabled="isLoading"
-          class="signup-button"
-          type="submit"
-      >
+      <Button :disabled="isLoading" type="submit">
         {{ isLoading ? 'Creating account...' : 'Sign Up' }}
-      </button>
+      </Button>
     </form>
 
-    <div class="login-link">
-      Already have an account?
-      <button class="text-button" @click="goToLogin">Log in</button>
+    <div class="auth-link">
+      <router-link to="/login">Already have an account?</router-link>
     </div>
-  </div>
+  </Panel>
 </template>
 
-<style scoped>
-.signup-container {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #333;
-}
-
-.signup-form {
+<style>
+.auth-form .p-panel-content {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-label {
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-input {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.signup-button {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: #4a6fa5;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.signup-button:hover {
-  background-color: #3a5a8c;
-}
-
-.signup-button:disabled {
-  background-color: #a0a0a0;
-  cursor: not-allowed;
 }
 
 .error-message {
@@ -190,25 +157,5 @@ input {
   color: #2ecc71;
   font-size: 0.9rem;
   margin-top: 0.5rem;
-}
-
-.login-link {
-  margin-top: 1.5rem;
-  text-align: center;
-  font-size: 0.9rem;
-}
-
-.text-button {
-  background: none;
-  border: none;
-  color: #4a6fa5;
-  cursor: pointer;
-  font-weight: 500;
-  padding: 0;
-  text-decoration: underline;
-}
-
-.text-button:hover {
-  color: #3a5a8c;
 }
 </style>

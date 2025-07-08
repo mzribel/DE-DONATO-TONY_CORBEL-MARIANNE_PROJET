@@ -1,0 +1,17 @@
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-element {
+    display: flex;
+}
+.form-element.horizontal {
+    flex-direction: row;
+    gap: 8px;
+}
+.form-element.vertical {
+    flex-direction: column;
+    gap: 4px;
+}

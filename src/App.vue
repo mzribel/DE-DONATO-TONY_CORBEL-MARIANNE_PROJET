@@ -2,17 +2,46 @@
 import { ref, onMounted, provide } from 'vue';
 import { getSession, onAuthStateChange } from './services/supabase/authService';
 import { useSessionRunner } from './composables/useSessionRunner';
-import Toolbar from "primevue/toolbar"
-import Tabs from "primevue/tabs"
-import Tab from "primevue/tab"
 import Avatar from "primevue/avatar"
 import Button from "primevue/button"
+import * as authService from "./services/supabase/authService";
+import {AuthState} from "./types/auth";
 const isAuthenticated = ref(false);
 
+const authState = ref(<AuthState>{
+  user: null,
+  session: null,
+  loading: true
+});
+provide('authState', authState);
+
 onMounted(async () => {
-  const data = await getSession();
-  isAuthenticated.value = !!data?.session;
+  authState.value.loading = true;
+  const { session } = await getSession();
+
+  if (session) {
+    authState.value.session = session;
+    authState.value.user = {
+      id: session.user.id,
+      email: session.user.email,
+      created_at: session.user.created_at,
+    };
+  }
+  authState.value.loading = false;
+
+  isAuthenticated.value = !!session;
   await sessionRunner.loadCurrentSession();
+});
+
+authService.onAuthStateChange((event, session) => {
+  authState.value.session = session;
+  authState.value.user = session?.user
+    ? {
+      id: session.user.id,
+      email: session.user.email,
+      created_at: session.user.created_at ?? ''
+    }
+    : null;
 });
 
 onAuthStateChange((event, session) => {
@@ -49,11 +78,15 @@ provide('userId', userId);
       </div>
     </nav>
     <nav v-else class="flex justify-end">
-      <RouterLink tag="div" to="/login">Login</RouterLink>
-      <RouterLink to="/signup">Signup</RouterLink>
+      <RouterLink tag="div" to="/login">
+        <div class="nav-tab">Login</div>
+      </RouterLink>
+      <RouterLink to="/signup">
+        <div class="nav-tab">Sign-up</div>
+      </RouterLink>
     </nav>
   </header>
-  <div id="content">
+  <div id="content" class="flex col flex-1">
     <RouterView></RouterView>
   </div>
 </template>
@@ -61,6 +94,7 @@ provide('userId', userId);
 <style>
 #app {
   flex:1;
+  overflow-x: hidden;
 }
 nav {
   padding: 1rem;
@@ -70,6 +104,8 @@ nav {
 
 #content {
   padding: 70px 20px 20px;
+  min-height: 100%;
+  width: 100%;
 }
 
 header {
@@ -96,7 +132,7 @@ a.router-link-active .nav-tab::after {
   position: absolute;
   content: "";
   left: 0;
-  bottom: 0px;
+  bottom: 0;
   width: 100%;
   height: 2px;
   background-color: var(--p-button-primary-border-color);

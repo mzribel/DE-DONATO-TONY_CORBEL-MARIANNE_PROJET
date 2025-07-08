@@ -34,7 +34,7 @@ function getTotalInterruptionDuration(session_part_pauses: any[]): number {
 <template>
   <h1>History</h1>
   <div v-if="sessions"  class="flex col row-gap-8">
-  <Panel toggleable v-for="session in sessions" collapsed>
+  <Panel toggleable v-for="session in sessions" collapsed class="session">
     <template #header>
       <div class="flex justify-between flex-1">
         <Button icon="pi pi-trash" severity="danger" rounded aria-label="Bookmark" variant="outlined" size="small" />
@@ -61,6 +61,15 @@ function getTotalInterruptionDuration(session_part_pauses: any[]): number {
 </div>
 </template>
 
-<style scoped>
-
-</style>
+<style>
+.session .p-panel-content {
+  justify-content: flex-start !important;
+  overflow-x: auto;
+}
+.session .p-datatable.p-component {
+  width: 100%;
+}
+.session .p-datatable-column-title {
+  text-wrap: nowrap;
+}
+ </style>

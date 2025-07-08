@@ -1,5 +1,5 @@
 import { supabase } from './client';
-import { Settings } from "../../types/Settings";
+import type { Settings } from '../../types/settings';
 
 export async function getSettings(userId: string): Promise<Settings | null> {
     const { data, error } = await supabase

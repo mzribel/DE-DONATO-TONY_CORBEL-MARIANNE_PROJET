@@ -3,8 +3,10 @@ import { getSession } from '../services/supabase/authService';
 
 import SettingsView from "../views/SettingsView.vue";
 import HistoryView from "../views/HistoryView.vue";
-import Auth from "../views/Auth/Auth.vue";
 import TimerView from "../views/TimerView.vue";
+import ProfileView from "../views/ProfileView.vue";
+import Signup from "../views/Auth/Signup.vue";
+import Login from "../views/Auth/Login.vue";
 
 const routes = [
     {
@@ -28,20 +30,17 @@ const routes = [
     { 
         path: '/login', 
         name: "Login", 
-        component: Auth,
-        props: { activeTab: 'login' }
+        component: Login,
     },
     { 
         path: '/signup', 
         name: "Signup", 
-        component: Auth,
-        props: { activeTab: 'signup' }
+        component: Signup,
     },
     { 
         path: '/profile', 
         name: "Profile", 
-        component: Auth,
-        props: { activeTab: 'profile' },
+        component: ProfileView,
         meta: { requiresAuth: true }
     }
 ]
@@ -54,13 +53,13 @@ export const router = createRouter({
 
 // Protection des routes
 router.beforeEach(async (to, from, next) => {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
-        const data = await getSession();
-        if (!data?.session) {
-            next({ name: 'Login' });
-        } else {
-            next();
-        }
+    const session = await getSession();
+    const isAuthenticated = !!session?.session;
+
+    if (to.meta.requiresAuth && !isAuthenticated) {
+        next('/login');
+    } else if ((to.path === '/login' || to.path === '/signup') && isAuthenticated) {
+        next('/');
     } else {
         next();
     }

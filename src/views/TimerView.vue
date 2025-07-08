@@ -64,7 +64,7 @@
     <!-- Session en cours -->
     <div v-else>
       <h3>{{ partLabel }} | {{ formatTime(sessionRunner.remainingTime.value) }}</h3>
-      <ProgressBar :value="sessionRunner.progress.value">&nbsp;</ProgressBar>
+      <ProgressBar :value="sessionRunner.progress.value" class="spinner">&nbsp;</ProgressBar>
 
       <div class="buttons">
         <template v-if="!sessionRunner.isTimerRunning.value">
@@ -85,7 +85,7 @@
 import { inject, ref, onMounted, computed } from 'vue';
 import type { SessionRunner } from '../types/sessions';
 import {sessionsService} from "../services/supabase/newSessionService";
-import {SESSION_PART_LABELS} from "../types/sessionPartsLabels";
+import {SESSION_PART_LABELS} from "../types/sessions";
 import { useSettingsForm } from '../composables/useSettingsForm';
 import Panel from 'primevue/panel';
 
@@ -181,11 +181,6 @@ function formatTime(seconds: number) {
   padding: 1rem;
 }
 
-label {
-  display: block;
-  margin: 0.5rem 0;
-}
-
 .buttons {
   display: flex;
   flex-wrap: wrap;
@@ -204,5 +199,9 @@ button {
 .p-panel-content {
   display: flex;
   justify-content: center;
+}
+
+.spinner {
+  stroke-width: 8px;
 }
 </style>
