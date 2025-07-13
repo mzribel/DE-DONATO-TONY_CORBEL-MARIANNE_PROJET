@@ -1,6 +1,6 @@
 import { ref } from "vue";
-import * as SettingsService from "../services/supabase/settingsService"
-import { Settings } from "../types/Settings";
+import * as SettingsService from "../services/supabase/settingsService";
+import { Settings } from "../types/settings";
 
 const settings = ref(null);
 const loading = ref(false);

@@ -1,59 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, provide } from 'vue';
-import { getSession, onAuthStateChange } from './services/supabase/authService';
-import { useSessionRunner } from './composables/useSessionRunner';
-import Avatar from "primevue/avatar"
+import { provide } from 'vue';
+// Services
+import { useAuth } from './composables/useAuth';
+// PrimeVue
+import Avatar from "primevue/avatar";
 import Button from "primevue/button"
-import * as authService from "./services/supabase/authService";
-import {AuthState} from "./types/auth";
-const isAuthenticated = ref(false);
 
-const authState = ref(<AuthState>{
-  user: null,
-  session: null,
-  loading: true
-});
+// Authentification
+const { authState, isAuthenticated, userId, sessionRunner } = useAuth();
+useAuth().setupRecoveryListener();
+
+// Variables globales
 provide('authState', authState);
-
-onMounted(async () => {
-  authState.value.loading = true;
-  const { session } = await getSession();
-
-  if (session) {
-    authState.value.session = session;
-    authState.value.user = {
-      id: session.user.id,
-      email: session.user.email,
-      created_at: session.user.created_at,
-    };
-  }
-  authState.value.loading = false;
-
-  isAuthenticated.value = !!session;
-  await sessionRunner.loadCurrentSession();
-});
-
-authService.onAuthStateChange((event, session) => {
-  authState.value.session = session;
-  authState.value.user = session?.user
-    ? {
-      id: session.user.id,
-      email: session.user.email,
-      created_at: session.user.created_at ?? ''
-    }
-    : null;
-});
-
-onAuthStateChange((event, session) => {
-  isAuthenticated.value = !!session;
-});
-
-const userId = '06a29c38-1879-49f8-a54c-db4b829a2b4c';
-const sessionRunner = useSessionRunner(userId);
-
-provide('sessionRunner', sessionRunner);
 provide('userId', userId);
-
+provide('sessionRunner', sessionRunner);
 </script>
 
 <template>

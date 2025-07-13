@@ -1,4 +1,3 @@
-// composables/usePomodoroSessions.ts
 import { ref, computed } from 'vue';
 import { supabase } from '../services/supabase/client';
 import type { Session } from '../types/sessions';

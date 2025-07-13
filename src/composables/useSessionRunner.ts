@@ -1,8 +1,8 @@
-import { ref, computed, onBeforeUnmount } from 'vue';
+import { ref, computed, onBeforeUnmount, Ref } from 'vue';
 import { sessionsService } from '../services/supabase/newSessionService';
 import { Session, SessionPart } from '../types/sessions';
 
-export function useSessionRunner(userId: string) {
+export function useSessionRunner(userId: Ref<string>) {
     const currentSession = ref<Session | null>(null);
     const currentPart = ref<SessionPart | null>(null);
     const remainingTime = ref<number>(0);
@@ -14,12 +14,9 @@ export function useSessionRunner(userId: string) {
     let timerId: ReturnType<typeof setInterval> | null = null;
     let heartbeatIntervalId: ReturnType<typeof setInterval> | null = null;
 
-    /**
-     * Charge la session en cours et la part en cours
-     */
     async function loadCurrentSession() {
         isLoading.value = true;
-        const { data: session } = await sessionsService.getCurrentSession(userId);
+        const { data: session } = await sessionsService.getCurrentSession(userId.value);
         if (!session) {
             currentSession.value = null;
             currentPart.value = null;
@@ -46,9 +43,6 @@ export function useSessionRunner(userId: string) {
         }
     }
 
-    /**
-     * Tick du timer
-     */
     async function tick() {
         const remainingMs = targetEndTime - Date.now();
         const seconds = Math.max(Math.ceil(remainingMs / 1000), 0);
@@ -73,6 +67,11 @@ export function useSessionRunner(userId: string) {
 
         isTimerRunning.value = true;
 
+        if (!currentPart.value.started_at) {
+            currentPart.value.started_at = new Date();
+            sessionsService.startPart(currentPart.value.id, currentPart.value.started_at).then();
+        }
+
         if (!heartbeatIntervalId) {
             heartbeatIntervalId = setInterval(sendHeartbeat, 5000);
         }
@@ -95,9 +94,6 @@ export function useSessionRunner(userId: string) {
         await sessionsService.updateRemainingTime(currentPart.value.id, remainingTime.value, true);
     }
 
-    /**
-     * Reprend le timer
-     */
     async function resumeTimer() {
         if (timerId || !currentPart.value || !isPaused.value) return;
         isPaused.value = false;
@@ -117,10 +113,6 @@ export function useSessionRunner(userId: string) {
         timerId = setInterval(tick, 1000);
     }
 
-
-    /**
-     * Arrête le timer
-     */
     function stopTimer() {
         if (timerId) {
             clearInterval(timerId);
@@ -133,10 +125,8 @@ export function useSessionRunner(userId: string) {
         isTimerRunning.value = false;
     }
 
-    /**
-     * Complète la part en cours et passe à la suivante
-     */
     async function completeCurrentPart() {
+        console.log("???")
         if (!currentPart.value) return;
         await sessionsService.completeSessionPart(currentPart.value.id);
         if (currentPauseId) {
@@ -146,23 +136,19 @@ export function useSessionRunner(userId: string) {
         await createNextSessionPart();
     }
 
-    /**
-     * Skip la part en cours et passe à la suivante
-     */
     async function skipCurrentPart() {
+        console.log("?")
         if (!currentPart.value) return;
         stopTimer();
         if (currentPauseId) {
             await sessionsService.endPause(currentPauseId.value);
             currentPauseId.value = null;
         }
-        await sessionsService.skipSessionPart(currentPart.value.id);
+        console.log(remainingTime.value);
+        await sessionsService.skipSessionPart(currentPart.value.id, remainingTime.value);
         await createNextSessionPart();
     }
 
-    /**
-     * Annule la session en cours (arrêt avant la fin)
-     */
     async function cancelCurrentSession() {
         if (!currentSession.value) return;
         stopTimer();
@@ -179,9 +165,6 @@ export function useSessionRunner(userId: string) {
         }
     }
 
-    /**
-     * Sauvegarde automatique avant fermeture (si besoin)
-     */
     async function saveBeforeUnload() {
         if (currentPart.value && !isPaused.value) {
             await sessionsService.updateRemainingTime(currentPart.value.id, remainingTime.value, false);
@@ -194,9 +177,6 @@ export function useSessionRunner(userId: string) {
         window.removeEventListener('beforeunload', saveBeforeUnload);
     });
 
-    /**
-     * Progression en % pour affichage
-     */
     const progress = computed(() => {
         if (!currentPart.value) return 0;
         return (

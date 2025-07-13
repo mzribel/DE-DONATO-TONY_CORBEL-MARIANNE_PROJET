@@ -7,6 +7,7 @@ import TimerView from "../views/TimerView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import Signup from "../views/Auth/Signup.vue";
 import Login from "../views/Auth/Login.vue";
+import ResetPassword from "../views/Auth/ResetPassword.vue";
 
 const routes = [
     {
@@ -42,6 +43,11 @@ const routes = [
         name: "Profile", 
         component: ProfileView,
         meta: { requiresAuth: true }
+    },
+    {
+        path: '/reset-password',
+        name: "ResetPassword",
+        component: ResetPassword
     }
 ]
 

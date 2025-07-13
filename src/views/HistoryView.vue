@@ -1,17 +1,19 @@
 <script setup lang="ts">
+import { inject, onMounted, Ref } from "vue";
+// Services
 import { useSessions } from "../composables/useSessions";
-import { inject, onMounted } from "vue";
+// PrimeVue
 import Panel from "primevue/panel"
 import DataTable from "primevue/datatable"
 import Column from "primevue/column"
 import Tag from "primevue/tag"
 import Button from "primevue/button"
 
-const userId:string = inject("userId");
+const userId = inject('userId') as Ref<string>;
 const {
   sessions,
   fetchSessions,
-} = useSessions(userId);
+} = useSessions(userId.value);
 
 onMounted(() => {
   fetchSessions();

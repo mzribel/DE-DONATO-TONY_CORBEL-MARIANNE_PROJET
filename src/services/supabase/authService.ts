@@ -35,3 +35,15 @@ export function onAuthStateChange(callback: (event: string, session: AuthSession
         callback(event, session);
     });
 }
+
+export async function resetPassword(email:string) {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'pomodoro://auth-callback',
+    })
+    if (error) console.error(error);
+    return data;
+}
+
+export const updatePassword = async (newPassword: string) => {
+    return await supabase.auth.updateUser({ password: newPassword });
+};

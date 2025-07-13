@@ -3,7 +3,6 @@ import { supabase } from './client';
 import { Session, SessionPart, SessionPartPause, CreateSessionInput, CreateSessionPartInput } from '../../types/sessions';
 
 export const sessionsService = {
-
     async createSession(params: CreateSessionInput) {
         const { data, error } = await supabase
             .from('sessions')
@@ -20,6 +19,7 @@ export const sessionsService = {
                 session_id: sessionId,
                 type: part.type,
                 duration: part.duration,
+                remaining_time: part.duration
             })
             .select()
             .single();
@@ -72,6 +72,7 @@ export const sessionsService = {
             .from('session_parts')
             .update({
                 is_completed: true,
+                remaining_time:0,
                 ended_at: new Date().toISOString(),
             })
             .eq('id', partId)
@@ -81,11 +82,12 @@ export const sessionsService = {
         return { data: data as SessionPart, error };
     },
 
-    async skipSessionPart(partId: string) {
+    async skipSessionPart(partId: string, remaining_time:number) {
         const { data, error } = await supabase
             .from('session_parts')
             .update({
                 is_skipped: true,
+                remaining_time: remaining_time,
                 ended_at: new Date().toISOString(),
             })
             .eq('id', partId)
@@ -123,6 +125,21 @@ export const sessionsService = {
             .single();
 
         return { data: data as SessionPartPause, error };
+    },
+
+    async startPart(partId: string, startedAt:Date) {
+        const { data, error } = await supabase
+            .from('session_parts')
+            .update([
+                {
+                    started_at: startedAtp.toISOString(),
+                },
+            ])
+            .eq('id', partId)
+            .select()
+            .single();
+
+        return { data: data as SessionPart, error };
     },
 
     async endPause(pauseId: string) {

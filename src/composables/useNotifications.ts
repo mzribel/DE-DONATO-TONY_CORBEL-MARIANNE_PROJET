@@ -1,3 +1,5 @@
+import { Ref } from "vue";
+
 export function useNotifications(enableNotifications: Ref<boolean>) {
     function sendNotification(title: string, body?: string) {
         if (!enableNotifications.value) {

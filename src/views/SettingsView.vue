@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import {computed, inject, onMounted, ref} from 'vue';
+import { computed, inject, onMounted, Ref, ref } from 'vue';
+// Services
 import { useSettingsForm } from '../composables/useSettingsForm';
-
+import { useNotifications } from "../composables/useNotifications";
+import { useSoundNotification } from "../composables/useSoundNotifications";
+// Components
+import ConfirmDialog from "../components/ConfirmDialog.vue"
+// PrimeVue
 import InputNumber from 'primevue/inputnumber';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
 import ToggleSwitch from "primevue/toggleswitch";
 import FieldSet from "primevue/fieldset";
 import ProgressSpinner from "primevue/progressspinner";
-import ConfirmDialog from "../components/ConfirmDialog.vue"
-import {useNotifications} from "../composables/useNotifications";
-import {useSoundNotification} from "../composables/useSoundNotifications";
 
 const {
   localSettings,
@@ -25,11 +27,11 @@ const {
 } = useSettingsForm();
 
 onMounted(() => {
-  loadSettings(userId);
+  loadSettings(userId.value);
 });
 
 const showConfirm = ref(false);
-const userId:string = inject("userId")
+const userId = inject('userId') as Ref<string>;
 
 const enableNotifications = computed(() => settings.value?.notifications_enabled ?? false);
 const { sendNotification } = useNotifications(enableNotifications);

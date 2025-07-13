@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue';
 import { useSettings } from './useSettings';
-import type { Settings } from '../types/Settings';
+import type { Settings } from '../types/settings';
 
 export function useSettingsForm() {
     const {
