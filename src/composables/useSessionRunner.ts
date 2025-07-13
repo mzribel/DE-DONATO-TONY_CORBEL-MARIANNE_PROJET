@@ -60,7 +60,7 @@ export function useSessionRunner(userId: Ref<string>) {
         await sessionsService.updateRemainingTime(currentPart.value.id, remainingTime.value, isPaused.value);
     }
 
-    function startTimer() {
+    async function startTimer() {
         if (timerId || isPaused.value || !currentPart.value) return;
         targetEndTime = Date.now() + remainingTime.value * 1000;
         timerId = setInterval(tick, 1000);
@@ -68,7 +68,7 @@ export function useSessionRunner(userId: Ref<string>) {
         isTimerRunning.value = true;
 
         if (!currentPart.value.started_at) {
-            currentPart.value.started_at = new Date();
+            currentPart.value.started_at = new Date().toISOString();
             sessionsService.startPart(currentPart.value.id, currentPart.value.started_at).then();
         }
 

@@ -50,7 +50,7 @@ const handleDeleteAccount = async () => {
       return;
     }
 
-    const { success, error } = await (window as any).electronAPI.deleteAccount(token);
+    const { _, error } = await (window as any).electronAPI.deleteAccount(token);
     if (error) {
       alert('Error deleting account: ' + error);
       return;
@@ -98,7 +98,7 @@ const handleResetPassword = () => {
       <div class="flex col row-gap-16">
         <div class="form-element vertical">
           <label>Reset password:</label>
-          <Button label="Send reset link" variant="outlined" severity="warn" @click="handleResetPassword" />
+          <Button disabled label="Send reset link" variant="outlined" severity="warn" @click="handleResetPassword" />
         </div>
         <div class="form-element vertical">
           <label>Delete account:</label>

@@ -127,12 +127,12 @@ export const sessionsService = {
         return { data: data as SessionPartPause, error };
     },
 
-    async startPart(partId: string, startedAt:Date) {
+    async startPart(partId: string, startedAt:string) {
         const { data, error } = await supabase
             .from('session_parts')
             .update([
                 {
-                    started_at: startedAtp.toISOString(),
+                    started_at: startedAt,
                 },
             ])
             .eq('id', partId)

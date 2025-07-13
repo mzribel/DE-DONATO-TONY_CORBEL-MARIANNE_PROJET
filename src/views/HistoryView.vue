@@ -8,16 +8,40 @@ import DataTable from "primevue/datatable"
 import Column from "primevue/column"
 import Tag from "primevue/tag"
 import Button from "primevue/button"
+import ProgressSpinner from "primevue/progressspinner";
 
 const userId = inject('userId') as Ref<string>;
 const {
   sessions,
   fetchSessions,
+  loading
 } = useSessions(userId.value);
 
 onMounted(() => {
   fetchSessions();
 });
+
+function formatIsoDateTime(isoString: string) {
+  const date = new Date(isoString);
+
+  const dayFormatter = new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+
+  const timeFormatter = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+
+  return {
+    day: dayFormatter.format(date),   // e.g. "Sun, 13/07/2025"
+    time: timeFormatter.format(date), // e.g. "21:03"
+  };
+}
 
 function getTotalInterruptionDuration(session_part_pauses: any[]): number {
   if (!session_part_pauses) return 0;
@@ -35,17 +59,35 @@ function getTotalInterruptionDuration(session_part_pauses: any[]): number {
 
 <template>
   <h1>History</h1>
-  <div v-if="sessions"  class="flex col row-gap-8">
+  <div v-if="loading" class="flex flex-1 align-center justify-between">
+    <ProgressSpinner style="width: 75px; height: 75px" strokeWidth="3" fill="transparent" />
+  </div>
+  <div v-else-if="!sessions || !sessions.length" class="flex flex-1 align-center justify-center no-session">
+    No session to show !
+  </div>
+  <div v-if="sessions.length"  class="flex col row-gap-8">
   <Panel toggleable v-for="session in sessions" collapsed class="session">
     <template #header>
-      <div class="flex justify-between flex-1">
-        <Button icon="pi pi-trash" severity="danger" rounded aria-label="Bookmark" variant="outlined" size="small" />
-      </div>
+        <div class="flex justify-between flex-1 align-center">
+          <div class="flex col session-header">
+            <div class="date">{{ formatIsoDateTime(session.created_at).day }}</div>
+            <div class="time">{{ formatIsoDateTime(session.created_at).time }}</div>
+          </div>
+          <Button icon="pi pi-trash" severity="danger" rounded aria-label="Bookmark" variant="outlined" size="small" />
+        </div>
     </template>
     <DataTable :value="session.session_parts">
       <Column field="type" header="Type"></Column>
-      <Column field="duration" header="Initial duration"></Column>
-      <Column field="duration" header="Elapsed time"></Column>
+      <Column field="duration" header="Initial duration">
+        <template #body="slotProps">
+          {{ slotProps.data.duration }}s
+        </template>
+      </Column>
+      <Column header="Elapsed time">
+        <template #body="slotProps">
+          {{ slotProps.data.duration - slotProps.data.remaining_time }}s
+        </template>
+      </Column>
       <Column header="Status">
         <template #body="slotProps">
           <Tag v-if="slotProps.data.is_completed" value="Completed" severity="success">Completed</Tag>
@@ -64,6 +106,12 @@ function getTotalInterruptionDuration(session_part_pauses: any[]): number {
 </template>
 
 <style>
+.no-session {
+  font-size: 14px;
+  opacity: 0.8;
+  font-style: italic;
+}
+
 .session .p-panel-content {
   justify-content: flex-start !important;
   overflow-x: auto;
@@ -74,4 +122,13 @@ function getTotalInterruptionDuration(session_part_pauses: any[]): number {
 .session .p-datatable-column-title {
   text-wrap: nowrap;
 }
- </style>
+.session-header .date {
+  font-style: italic;
+  font-size: 14px;
+}
+.session-header .time {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+</style>

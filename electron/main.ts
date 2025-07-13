@@ -164,8 +164,8 @@
 // })
 
 import { app, BrowserWindow, ipcMain } from 'electron';
-import notifier from 'node-notifier';
 import * as path from 'node:path';
+import { Notification } from 'electron';
 let mainWindow: BrowserWindow | null = null;
 
 async function createWindow() {
@@ -179,6 +179,7 @@ async function createWindow() {
             nodeIntegration: false,
             sandbox: false,
         },
+        icon: 'public/favicon.ico' // sets window icon
     });
 
     mainWindow.setMenuBarVisibility(false);
@@ -207,12 +208,11 @@ app.on('window-all-closed', () => {
     }
 });
 
-
-ipcMain.handle('notify', (_, { title, body }: { title: string; body: string }) => {
-    notifier.notify({
+ipcMain.handle('notify', (_event, { title, body }: { title: string; body: string }) => {
+    new Notification({
         title,
-        message: body,
-        sound: false, // essaie de couper le son si supporté
+        body,
+        silent: true, // ou false si tu veux un son
         icon: path.join(__dirname, '..', 'public', 'favicon.ico'),
-    });
+    }).show();
 });

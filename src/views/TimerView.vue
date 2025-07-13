@@ -21,6 +21,29 @@ const {
   loadSettings,
 } = useSettingsForm();
 
+const skipLoading = ref<boolean>(false);
+const startLoading = ref<boolean>(false);
+const stopLoading = ref<boolean>(false);
+const disableButton = computed(() => {
+  return skipLoading.value || stopLoading.value || startLoading.value;
+})
+
+async function activateButton(callback: () => Promise<void>, ref: Ref<boolean>): Promise<void> {
+  ref.value = true;
+  await callback();
+  ref.value = false;
+}
+
+async function clickStartButton(callback: () => Promise<void>): Promise<void> {
+  return activateButton(callback, startLoading)
+}
+async function clickSkipButton(callback: () => Promise<void>): Promise<void> {
+  return activateButton(callback, skipLoading)
+}
+async function clickStopButton(callback: () => Promise<void>): Promise<void> {
+  return activateButton(callback, stopLoading)
+}
+
 onMounted(async () => {
   await loadSettings(userId.value);
   form.value = {
@@ -54,9 +77,8 @@ const estimatedEndTime = computed(() => {
 });
 
 // Lancer une nouvelle session
-// Lancer une nouvelle session
 async function startNewSession() {
-  const { data: session, error } = await sessionsService.createSession({
+  const { data: session, _ } = await sessionsService.createSession({
     user_id: userId.value,
     pomodoro_duration: form.value.pomodoro_duration * 60,
     short_break_duration: form.value.short_break_duration * 60,
@@ -68,7 +90,7 @@ async function startNewSession() {
   });
 
   // Créé la première partie directement
-  const { error: partError } = await sessionsService.createSessionPart(session.id, {
+  await sessionsService.createSessionPart(session.id, {
     type: 'pomodoro',
     duration: form.value.pomodoro_duration * 60,
   });
@@ -122,7 +144,7 @@ function formatTime(seconds: number) {
         <div v-if="form.cycles_before_long_break <= form.total_cycles" ><b>Pomodoros before long break :</b> {{ form.cycles_before_long_break }}</div>
         <div><b>Est. end time :</b> {{ estimatedEndTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) }} ({{ formatTime(totalDuration) }}min)</div>
       </div>
-      <Button @click="startNewSession" label="Start" icon="pi pi-caret-right"></Button>
+      <Button @click="startNewSession" label="Start" icon="pi pi-caret-right" :loading="startLoading" :disabled="disableButton"></Button>
     </div>
 
     <!-- Session en cours -->
@@ -132,14 +154,14 @@ function formatTime(seconds: number) {
 
       <div class="buttons">
         <template v-if="!sessionRunner.isTimerRunning.value">
-          <Button @click="sessionRunner.startTimer()" icon="pi pi-caret-right" label="Start"></Button>
+          <Button @click="clickStartButton(sessionRunner.startTimer)" icon="pi pi-caret-right" label="Start" :disabled="disableButton" :loading="startLoading"></Button>
         </template>
         <template v-else>
-          <Button @click="sessionRunner.pauseTimer" v-if="!sessionRunner.isPaused.value" icon="pi pi-pause" label="Pause" variant="outlined"></Button>
-          <Button @click="sessionRunner.resumeTimer" v-else icon="pi pi-caret-right" label="Resume"></Button>
+          <Button v-on:click="clickStartButton(sessionRunner.pauseTimer)" v-if="!sessionRunner.isPaused.value" icon="pi pi-pause" label="Pause" variant="outlined" :loading="startLoading" :disabled="disableButton"></Button>
+          <Button @click="clickStartButton(sessionRunner.resumeTimer)" v-else icon="pi pi-caret-right" label="Resume" :disabled="disableButton" :loading="startLoading"></Button>
         </template>
-        <Button @click="sessionRunner.skipCurrentPart" icon="pi pi-angle-double-right" label="Skip" severity="danger" variant="outlined"></Button>
-        <Button @click="sessionRunner.cancelCurrentSession" icon="pi pi-times" label="Stop session" severity="danger"></Button>
+        <Button @click="clickSkipButton(sessionRunner.skipCurrentPart)" icon="pi pi-angle-double-right" label="Skip" severity="danger" variant="outlined" :disabled="disableButton" :loading="skipLoading"></Button>
+        <Button @click="clickStopButton(sessionRunner.cancelCurrentSession)" icon="pi pi-times" label="Stop session" severity="danger" :disabled="disableButton" :loading="stopLoading"></Button>
       </div>
     </div>
 </template>
