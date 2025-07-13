@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref, onMounted, computed, Ref } from 'vue';
+import {inject, ref, onMounted, computed, Ref, watch} from 'vue';
 // Services
 import { sessionsService } from "../services/supabase/newSessionService";
 import { SESSION_PART_LABELS } from "../types/sessions";
@@ -10,6 +10,8 @@ import Panel from 'primevue/panel';
 import Button from 'primevue/button'
 import ProgressBar from 'primevue/progressbar';
 import ProgressSpinner from "primevue/progressspinner";
+import {useNotifications} from "../composables/useNotifications";
+import {useSoundNotification} from "../composables/useSoundNotifications";
 
 // Variables globales
 const sessionRunner = inject('sessionRunner') as ReturnType<typeof useSessionRunner>;
@@ -44,6 +46,12 @@ async function clickStopButton(callback: () => Promise<void>): Promise<void> {
   return activateButton(callback, stopLoading)
 }
 
+// Initialisation des variables de notification
+const textNotificationEnabled = ref(false);
+const soundNotificationEnabled = ref(false);
+const { sendNotification } = useNotifications(textNotificationEnabled);
+const { playSound } = useSoundNotification(soundNotificationEnabled);
+
 onMounted(async () => {
   await loadSettings(userId.value);
   form.value = {
@@ -53,9 +61,21 @@ onMounted(async () => {
     cycles_before_long_break: settings.value.cycles_before_long_break,
     total_cycles: settings.value.cycles_before_long_break,
     auto_repeat: settings.value.auto_repeat,
-    auto_start: settings.value.auto_start
+    auto_start: settings.value.auto_start,
+    sound_notification: settings.value.sound_enabled,
+    text_notification: settings.value.notifications_enabled
   }
+
+  // maj des variables de notification
+  soundNotificationEnabled.value = settings.value.sound_enabled;
+  textNotificationEnabled.value = settings.value.notifications_enabled;
 });
+
+
+watch(() => sessionRunner.currentSession.value, () => {
+    sendNotification('Pomodoro Session Completed', 'Your pomodoro session has been completed successfully!');
+    playSound();
+}, { deep: true });
 
 // État local du formulaire
 const form = ref(null);
@@ -78,7 +98,7 @@ const estimatedEndTime = computed(() => {
 
 // Lancer une nouvelle session
 async function startNewSession() {
-  const { data: session, _ } = await sessionsService.createSession({
+  const { data: session, error } = await sessionsService.createSession({
     user_id: userId.value,
     pomodoro_duration: form.value.pomodoro_duration * 60,
     short_break_duration: form.value.short_break_duration * 60,
