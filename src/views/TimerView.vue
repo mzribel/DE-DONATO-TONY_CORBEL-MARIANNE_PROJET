@@ -98,7 +98,7 @@ const estimatedEndTime = computed(() => {
 
 // Lancer une nouvelle session
 async function startNewSession() {
-  const { data: session, error } = await sessionsService.createSession({
+  const { data: session } = await sessionsService.createSession({
     user_id: userId.value,
     pomodoro_duration: form.value.pomodoro_duration * 60,
     short_break_duration: form.value.short_break_duration * 60,
