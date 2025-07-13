@@ -13,6 +13,5 @@ import { contextBridge, ipcRenderer } from 'electron';
  */
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    // Notifications
     notify: (title: string, body: string) => ipcRenderer.invoke('notify', { title, body }),
 });

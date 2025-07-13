@@ -73,7 +73,7 @@ provide('userId', userId);
 
         </RouterLink>
         <RouterLink to="/profile">
-          <Avatar image="mariannepray.png" style="border-radius: 4px;"/>
+          <Avatar image="img/avatar.png" style="border-radius: 4px;"/>
         </RouterLink>
       </div>
     </nav>

@@ -74,7 +74,7 @@ export function useSessionRunner(userId: string) {
         isTimerRunning.value = true;
 
         if (!heartbeatIntervalId) {
-            heartbeatIntervalId = setInterval(sendHeartbeat, 5000); // toutes les 30s
+            heartbeatIntervalId = setInterval(sendHeartbeat, 5000);
         }
     }
 
@@ -84,7 +84,7 @@ export function useSessionRunner(userId: string) {
         timerId = null;
         isPaused.value = true;
 
-        // ✅ Créer la pause en base
+        // Crée la pause en base
         const { data: pause, error } = await sessionsService.startPause(currentPart.value.id);
         if (error) {
             console.error('Erreur création pause', error);
@@ -102,7 +102,7 @@ export function useSessionRunner(userId: string) {
         if (timerId || !currentPart.value || !isPaused.value) return;
         isPaused.value = false;
 
-        // ✅ Clôturer la pause en base
+        // Termine la pause en base
         if (currentPauseId) {
             const { error } = await sessionsService.endPause(currentPauseId.value);
             if (error) {
@@ -208,7 +208,7 @@ export function useSessionRunner(userId: string) {
     async function createNextSessionPart() {
         if (!currentSession.value) return;
 
-        // Récupérer le nombre de pomodoros complétés
+        // Récupère les pomodoros terminés
         const { data: parts, error } = await sessionsService.getAllSessionParts(currentSession.value.id);
         if (error || !parts) {
             console.error('Erreur récupération parts pour déterminer la suite', error);
@@ -225,7 +225,7 @@ export function useSessionRunner(userId: string) {
         let duration: number;
 
         if (!lastPart || lastPart.type === 'short_break' || lastPart.type === 'long_break') {
-            // Après une pause, créer un pomodoro si cycles restants
+            // Après une pause, crée un pomodoro si cycles restants
             if (completedPomodoros < currentSession.value.total_cycles) {
                 nextType = 'pomodoro';
                 duration = currentSession.value.pomodoro_duration;
@@ -237,7 +237,7 @@ export function useSessionRunner(userId: string) {
                 return;
             }
         } else if (lastPart.type === 'pomodoro') {
-            // Après un pomodoro, décider entre short_break et long_break
+            // Après un pomodoro, décide entre short_break et long_break
             if ((completedPomodoros % currentSession.value.cycles_before_long_break) === 0) {
                 nextType = 'long_break';
                 duration = currentSession.value.long_break_duration;
@@ -250,7 +250,7 @@ export function useSessionRunner(userId: string) {
             return;
         }
 
-        // Créer dynamiquement la partie suivante
+        // Crée dynamiquement la partie suivante
         const { error: createError } = await sessionsService.createSessionPart(currentSession.value.id, {
             type: nextType,
             duration,
@@ -260,7 +260,7 @@ export function useSessionRunner(userId: string) {
             console.error('Erreur création de la part suivante', createError);
         }
 
-        // Charger la nouvelle part
+        // Charge la nouvelle partie
         await loadCurrentSession();
     }
 

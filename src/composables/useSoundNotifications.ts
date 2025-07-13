@@ -1,6 +1,6 @@
 import { Ref, isRef } from 'vue';
 
-export function useSoundNotification(enableSound: Ref<boolean> | boolean, filename="notification.mp3") {
+export function useSoundNotification(enableSound: Ref<boolean> | boolean, filename="sounds/notification.mp3") {
     const sound_path = "/"
     // Créer l'élément audio une seule fois
     const audio = new Audio(sound_path+filename);

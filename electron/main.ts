@@ -48,6 +48,6 @@ ipcMain.handle('notify', (_, { title, body }: { title: string; body: string }) =
         title,
         message: body,
         sound: false, // essaie de couper le son si supporté
-        icon: path.join(__dirname, '..', 'public', 'mariannepray.ico'), // chemin absolu ou relatif correct
+        icon: path.join(__dirname, '..', 'public', 'favicon.ico'),
     });
 });

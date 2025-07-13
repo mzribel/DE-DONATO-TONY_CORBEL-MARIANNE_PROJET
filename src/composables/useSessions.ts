@@ -8,9 +8,6 @@ export function useSessions(userId?: string) {
     const loading = ref(false);
     const error = ref<string | null>(null);
 
-    /**
-     * Fetch sessions depuis Supabase
-     */
     const fetchSessions = async () => {
         loading.value = true;
         error.value = null;
@@ -40,24 +37,16 @@ export function useSessions(userId?: string) {
         }
     };
 
-    /**
-     * STATISTIQUES
-     */
-
-        // Nombre total de sessions
     const totalSessions = computed(() => sessions.value.length);
 
-    // Temps total productif (en minutes)
     const totalFocusMinutes = computed(() =>
         sessions.value.reduce((sum, session) => sum + session.pomodoro_duration, 0)
     );
 
-    // Durée moyenne d'une session (en minutes)
     const averageSessionMinutes = computed(() =>
         totalSessions.value > 0 ? totalFocusMinutes.value / totalSessions.value : 0
     );
 
-    // Sessions par jour
     const sessionsByDay = computed(() => {
         const map: Record<string, Session[]> = {};
         sessions.value.forEach(session => {
@@ -68,7 +57,6 @@ export function useSessions(userId?: string) {
         return map;
     });
 
-    // Sessions filtrées sur la semaine courante (pour graph semaine)
     const currentWeekSessions = computed(() => {
         const startOfWeek = new Date();
         startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay()); // dimanche

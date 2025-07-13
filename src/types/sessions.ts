@@ -33,14 +33,14 @@ export interface SessionPart {
     type: SessionPartType;
     duration: number; // en secondes
     order: number;
-    started_at: string | null; // ISO timestamp ou null si pas encore démarré
-    ended_at: string | null;   // ISO timestamp ou null si pas terminé
+    started_at: string | null;
+    ended_at: string | null;
     is_completed: boolean;
     is_skipped: boolean;
-    remaining_time: number | null; // en secondes, null si pas de sauvegarde
-    is_paused: boolean | null;     // null si jamais mis en pause
-    created_at: string;            // ISO timestamp
-    updated_at: string;            // ISO timestamp
+    remaining_time: number | null;
+    is_paused: boolean | null;
+    created_at: string;
+    updated_at: string;
 }
 
 /**
@@ -49,10 +49,10 @@ export interface SessionPart {
 export interface SessionPartPause {
     id: string;
     session_part_id: string;
-    started_at: string;           // ISO timestamp
-    ended_at: string | null;      // ISO timestamp ou null si en cours
-    created_at: string;           // ISO timestamp
-    updated_at: string;           // ISO timestamp
+    started_at: string;
+    ended_at: string | null;
+    created_at: string;
+    updated_at: string;
 }
 /**
  * Session complète (sessions table)
@@ -68,8 +68,8 @@ export interface Session {
     auto_repeat: boolean;
     auto_start: boolean;
     is_running: boolean;
-    created_at: string; // ISO timestamp
-    updated_at: string; // ISO timestamp
+    created_at: string;
+    updated_at: string;
 }
 
 import { useSessionRunner } from '../composables/useSessionRunner';

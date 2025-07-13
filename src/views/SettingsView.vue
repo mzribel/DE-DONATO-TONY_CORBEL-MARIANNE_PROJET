@@ -38,7 +38,7 @@ const sendTestNotification = () => {
 }
 
 const enableSound = computed(() => settings.value?.sound_enabled ?? false);
-const { playSound } = useSoundNotification(enableSound, "test_sound.mp3");
+const { playSound } = useSoundNotification(enableSound, "sounds/test_sound.mp3");
 const playTestSound = () => {
   playSound();
 }
