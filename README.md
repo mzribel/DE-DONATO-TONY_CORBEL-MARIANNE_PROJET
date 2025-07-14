@@ -60,6 +60,10 @@ Pour le bien de la correction, les credentials de l'appli Supabase utilisée peu
 A noter que certaines fonctionnalités optionnelles (notamment la modification du mot de passe et la suppression du compte) fonctionnent en dév mais pas en build donc les boutons sont grisés.
 De la même façon, les fichiers sonores posent encore problème donc le son n'est pas disponible en build, seulement en dév.
 
+Installer les dépendances : 
+```
+npm i
+```
 
 ## Dév
 
