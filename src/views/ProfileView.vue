@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, inject, Ref} from 'vue';
+import {computed, inject, ref, Ref} from 'vue';
 import {router} from '../router';
 // Services
 import * as authService from '../services/supabase/authService';
@@ -8,6 +8,7 @@ import {AuthState} from '../types/auth';
 import Button from 'primevue/button';
 import Fieldset from 'primevue/fieldset';
 import InputText from 'primevue/inputtext';
+import ConfirmDialog from "../components/ConfirmDialog.vue";
 
 // Variables globales
 const authState = inject('authState') as Ref<AuthState>;
@@ -31,16 +32,13 @@ const daysSinceCreation = computed(() => {
 const handleLogout = async () => {
   try {
     await authService.signOut();
-    authState.value.user = null;
-    authState.value.session = null;
     await router.push('/login');
   } catch (err) {
     console.error('Logout error:', err);
   }
 };
-const handleDeleteAccount = async () => {
-  if (!confirm('This will permanently delete your account. Continue?')) return;
 
+const handleDeleteAccount = async () => {
   try {
     const session = (await authService.getSession())?.session;
     const token = session?.access_token;
@@ -66,6 +64,7 @@ const handleResetPassword = () => {
   if (!userEmail.value) return;
   authService.resetPassword(userEmail.value);
 };
+const showConfirm = ref<boolean>(false);
 
 </script>
 
@@ -102,9 +101,10 @@ const handleResetPassword = () => {
         </div>
         <div class="form-element vertical">
           <label>Delete account:</label>
-          <Button label="Delete account" severity="danger" @click="handleDeleteAccount" />
+          <Button label="Delete account" severity="danger" @click="showConfirm = true" />
         </div>
       </div>
     </Fieldset>
   </div>
+  <ConfirmDialog v-model="showConfirm" @confirm="handleDeleteAccount" title="Delete account" message="Are you sure you want to proceed ? The account and all its data will be permanently erased."/>
 </template>

@@ -169,6 +169,15 @@ export const sessionsService = {
         return { data: data as Session, error };
     },
 
+    async deleteSession(sessionId: string) {
+        const { error } = await supabase
+            .from('sessions')
+            .delete()
+            .eq('id', sessionId);
+
+        return { error };
+    },
+
     async cancelSession(sessionId: string) {
         const { data: sessionData, error: sessionError } = await supabase
             .from('sessions')
@@ -197,4 +206,5 @@ export const sessionsService = {
             partsError,
         };
     },
+
 };

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, onMounted, Ref } from "vue";
+import {inject, onMounted, ref, Ref} from "vue";
 // Services
 import { useSessions } from "../composables/useSessions";
 // PrimeVue
@@ -9,6 +9,8 @@ import Column from "primevue/column"
 import Tag from "primevue/tag"
 import Button from "primevue/button"
 import ProgressSpinner from "primevue/progressspinner";
+import {sessionsService} from "../services/supabase/newSessionService";
+const { deleteSession } = sessionsService;
 
 const userId = inject('userId') as Ref<string>;
 const {
@@ -55,11 +57,20 @@ function getTotalInterruptionDuration(session_part_pauses: any[]): number {
   }, 0);
   return Math.round(total);
 }
+
+const deletingId = ref<string>(null);
+async function handleDelete(sessionId:string) {
+  deletingId.value = sessionId;
+  await deleteSession(sessionId);
+  await fetchSessions();
+  deletingId.value = null;
+}
+
 </script>
 
 <template>
   <h1>History</h1>
-  <div v-if="loading" class="flex flex-1 align-center justify-between">
+  <div v-if="loading && !deletingId" class="flex flex-1 align-center justify-between">
     <ProgressSpinner style="width: 75px; height: 75px" strokeWidth="3" fill="transparent" />
   </div>
   <div v-else-if="!sessions || !sessions.length" class="flex flex-1 align-center justify-center no-session">
@@ -73,7 +84,7 @@ function getTotalInterruptionDuration(session_part_pauses: any[]): number {
             <div class="date">{{ formatIsoDateTime(session.created_at).day }}</div>
             <div class="time">{{ formatIsoDateTime(session.created_at).time }}</div>
           </div>
-          <Button icon="pi pi-trash" severity="danger" rounded aria-label="Bookmark" variant="outlined" size="small" />
+          <Button icon="pi pi-trash" severity="danger" rounded aria-label="Bookmark" variant="outlined" size="small" @click="handleDelete(session.id)" :disabled="deletingId != null" :loading="session.id == deletingId" />
         </div>
     </template>
     <DataTable :value="session.session_parts">
@@ -91,7 +102,8 @@ function getTotalInterruptionDuration(session_part_pauses: any[]): number {
       <Column header="Status">
         <template #body="slotProps">
           <Tag v-if="slotProps.data.is_completed" value="Completed" severity="success">Completed</Tag>
-          <Tag v-if="slotProps.data.is_skipped" value="Skipped" severity="warn">Skipped</Tag>
+          <Tag v-else-if="slotProps.data.is_skipped" value="Skipped" severity="danger">Skipped</Tag>
+          <Tag v-else value="Pending" severity="warn">Pending</Tag>
         </template>
       </Column>
       <Column header="Interruptions">

@@ -8,12 +8,14 @@ import Button from "primevue/button"
 
 // Authentification
 const { authState, isAuthenticated, userId, sessionRunner } = useAuth();
-useAuth().setupRecoveryListener();
+// useAuth().setupRecoveryListener();
 
 // Variables globales
 provide('authState', authState);
 provide('userId', userId);
 provide('sessionRunner', sessionRunner);
+
+console.log(authState, userId)
 </script>
 
 <template>

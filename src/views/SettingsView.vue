@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, Ref, ref } from 'vue';
+import {computed, inject, onMounted, Ref, ref, watch} from 'vue';
 // Services
 import { useSettingsForm } from '../composables/useSettingsForm';
 import { useNotifications } from "../composables/useNotifications";
@@ -35,6 +35,11 @@ onMounted(() => {
 });
 
 const modalVisible = ref(false);
+watch(modalVisible, (visible) => {
+  if (visible) {
+    tempSelectedRingtone.value = selectedRingtone.value;
+  }
+});
 
 const showConfirm = ref(false);
 const userId = inject('userId') as Ref<string>;
@@ -46,12 +51,19 @@ const sendTestNotification = () => {
 }
 
 const enableSound = computed(() => settings.value?.sound_enabled ?? false);
-const { playSound } = useSoundNotification("sounds/test_sound.mp3", enableSound);
-const playTestSound = () => {
-  playSound();
-}
 
-const selectedRingtone = ref<typeof ringtones[0]>(ringtones[0]);
+const selectedRingtone = ref<typeof ringtones[0]>(ringtones[0]); // la valeur effective
+watch(
+  () => localSettings.value.ringtone_id,
+  (newId) => {
+    const match = ringtones.find(r => r.id === newId);
+    if (match) {
+      selectedRingtone.value = match;
+    }
+  },
+  { immediate: true }
+);
+const tempSelectedRingtone = ref<typeof ringtones[0] | null>(null); // sélection en cours dans la modale
 
 let previewAudio: HTMLAudioElement | null = null;
 
@@ -67,15 +79,28 @@ function playPreview(file: string) {
 
 // Validation
 function confirmSelection() {
-  if (!selectedRingtone.value) return;
+  if (!tempSelectedRingtone.value) return;
 
-  settings.value.ringtone_id = selectedRingtone.value.id;
+  selectedRingtone.value = tempSelectedRingtone.value;
+  localSettings.value.ringtone_id = tempSelectedRingtone.value.id;
   modalVisible.value = false;
 }
+
+let lastSelectedRingtone: typeof ringtones[0] | null = null;
+
+function onSelectionChange(newSelection: typeof ringtones[0] | null) {
+  if (newSelection) {
+    tempSelectedRingtone.value = newSelection;
+    lastSelectedRingtone = newSelection;
+  } else if (lastSelectedRingtone) {
+    tempSelectedRingtone.value = lastSelectedRingtone;
+  }
+}
+
 </script>
 
 <template>
-  <ConfirmDialog v-model="showConfirm" @confirm="resetSettings(userId)"/>
+  <ConfirmDialog v-model="showConfirm" @confirm="resetSettings(userId)" title="Reset settings" message="Reset all settings to default ?"/>
     <div class="flex justify-between">
       <h1>Settings</h1>
       <Button @click="showConfirm=true" size="small" variant="outlined" severity="danger" v-if="settings">Reset settings</Button>
@@ -102,9 +127,9 @@ function confirmSelection() {
             <InputNumber type="text" id="long-break-duration" v-model="localSettings.long_break_duration"></InputNumber>
           </div>
           <div class="form-element vertical">
-            <label for="cycles-before-long-break">Cycles before long break :</label>
+            <label for="cycles-before-long-break">Pomodoros before long break :</label>
             <InputNumber type="text" id="cycles-before-long-break" v-model="localSettings.cycles_before_long_break"></InputNumber>
-            <Message severity="secondary" variant="simple" size="small">A classic Pomodoro is 4 cycles of focus + short break before a long break</Message>
+            <Message severity="secondary" variant="simple" size="small">A classic session is 4 pomodoros with short breaks in between, before a long break</Message>
           </div>
         </div>
 
@@ -120,7 +145,7 @@ function confirmSelection() {
               <Message severity="secondary" variant="simple" size="small">Play a sound when the timer ends</Message>
             </div>
             <div class="form-element horizontal align-center">
-              <Button @click="playTestSound" v-if="settings.sound_enabled" icon="pi pi-volume-up" rounded aria-label="Save" size="small" variant="outlined" severity="contrast"/>
+              <Button v-if="settings.sound_enabled" icon="pi pi-volume-up" rounded aria-label="Save" size="small" variant="outlined" severity="contrast"/>
               <ToggleSwitch v-model="localSettings.sound_enabled"/>
             </div>
           </div>
@@ -154,10 +179,11 @@ function confirmSelection() {
     </div>
   <Dialog v-model:visible="modalVisible" modal header="Choose a ringtone" class="ringtone-modal">
       <DataTable
-        v-model:selection="selectedRingtone"
+        v-model:selection="tempSelectedRingtone"
         :value="ringtones"
         selection-mode="single"
         dataKey="id"
+        @update:selection="onSelectionChange"
       >
         <Column field="name" header="Name"></Column>
         <Column header="Play">

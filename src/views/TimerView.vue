@@ -50,10 +50,12 @@ async function clickStopButton(callback: () => Promise<void>): Promise<void> {
 const textNotificationEnabled = ref(false);
 const soundNotificationEnabled = ref(false);
 const { sendNotification } = useNotifications(textNotificationEnabled);
-const { playSound } = useSoundNotification(soundNotificationEnabled);
+const ringtone_id = ref<number | null>(null);
+const { playSound } = useSoundNotification(ringtone_id, soundNotificationEnabled);
 
 onMounted(async () => {
   await loadSettings(userId.value);
+  ringtone_id.value = settings.value.ringtone_id;
   form.value = {
     pomodoro_duration: settings.value.pomodoro_duration,
     short_break_duration: settings.value.short_break_duration,
@@ -72,10 +74,30 @@ onMounted(async () => {
 });
 
 
-watch(() => sessionRunner.currentSession.value, () => {
-    sendNotification('Pomodoro Session Completed', 'Your pomodoro session has been completed successfully!');
+let timerEndedNaturally = false;
+
+// Watch pour détecter la fin naturelle du timer
+watch(() => sessionRunner.remainingTime.value, (newVal, oldVal) => {
+  if (oldVal > 0 && newVal === 0) {
+    timerEndedNaturally = true;
+  }
+});
+
+// Watch sur le changement de part
+watch(() => sessionRunner.currentPart.value, (newPart, oldPart) => {
+  if (!oldPart || !newPart || oldPart.id === newPart.id) return;
+  if (timerEndedNaturally) {
+    timerEndedNaturally = false;
+    console.log(sessionRunner.currentPart.value)
+    if (sessionRunner.currentPart.value.type == SESSION_PART_LABELS.pomodoro) {
+      sendNotification('Pause terminée !', 'Allez hop on se remet au travail !');
+    } else {
+      sendNotification('Pomodoro terminé !', 'Profite bien de ta pause :^)');
+    }
     playSound();
-}, { deep: true });
+  }
+});
+
 
 // État local du formulaire
 const form = ref(null);
@@ -135,7 +157,7 @@ function formatTime(seconds: number) {
 </script>
 
 <template>
-    <h1>Pomodoro</h1>
+    <h1>Pomodoro Session</h1>
 
     <!-- Chargement -->
     <div v-if="sessionRunner.isLoading.value || loading" class="flex flex-1 align-center justify-between">
@@ -168,9 +190,14 @@ function formatTime(seconds: number) {
     </div>
 
     <!-- Session en cours -->
-    <div v-else>
-      <h3>{{ partLabel }} | {{ formatTime(sessionRunner.remainingTime.value) }}</h3>
-      <ProgressBar :value="sessionRunner.progress.value" class="spinner">&nbsp;</ProgressBar>
+    <div v-else class="flex col align-center row-gap-16">
+      <div class="timer-container">
+        <div class="timer-label">{{ partLabel }}</div>
+        <h3 class="timer">{{ formatTime(sessionRunner.remainingTime.value) }}</h3>
+        <ProgressBar :value="sessionRunner.progress.value" class="progress-bar">&nbsp;</ProgressBar>
+      </div>
+
+
 
       <div class="buttons">
         <template v-if="!sessionRunner.isTimerRunning.value">
@@ -187,6 +214,14 @@ function formatTime(seconds: number) {
 </template>
 
 <style>
+h3.timer {
+  font-size: 100px;
+}
+.timer-label {
+  text-transform: uppercase;
+  opacity: .75;
+  letter-spacing: .1em;
+}
 .buttons {
   display: flex;
   flex-wrap: wrap;
@@ -209,5 +244,15 @@ button {
 
 .spinner {
   stroke-width: 8px;
+}
+.progress-bar {
+  width: 100%;
+}
+.timer-container {
+  padding-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 500px);
 }
 </style>

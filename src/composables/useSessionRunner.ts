@@ -1,8 +1,8 @@
-import { ref, computed, onBeforeUnmount, Ref } from 'vue';
+import {ref, computed, onBeforeUnmount, Ref, ComputedRef} from 'vue';
 import { sessionsService } from '../services/supabase/newSessionService';
 import { Session, SessionPart } from '../types/sessions';
 
-export function useSessionRunner(userId: Ref<string>) {
+export function useSessionRunner(userId: Ref<string> | ComputedRef<string>) {
     const currentSession = ref<Session | null>(null);
     const currentPart = ref<SessionPart | null>(null);
     const remainingTime = ref<number>(0);
@@ -126,7 +126,6 @@ export function useSessionRunner(userId: Ref<string>) {
     }
 
     async function completeCurrentPart() {
-        console.log("???")
         if (!currentPart.value) return;
         await sessionsService.completeSessionPart(currentPart.value.id);
         if (currentPauseId) {
@@ -172,10 +171,10 @@ export function useSessionRunner(userId: Ref<string>) {
     }
 
     window.addEventListener('beforeunload', saveBeforeUnload);
-    onBeforeUnmount(() => {
-        stopTimer();
-        window.removeEventListener('beforeunload', saveBeforeUnload);
-    });
+    // onBeforeUnmount(() => {
+    //     stopTimer();
+    //     window.removeEventListener('beforeunload', saveBeforeUnload);
+    // });
 
     const progress = computed(() => {
         if (!currentPart.value) return 0;
@@ -184,6 +183,30 @@ export function useSessionRunner(userId: Ref<string>) {
             Math.floor(((remainingTime.value ?? 0) / currentPart.value.duration) * 100)
         );
     });
+
+    function stop() {
+        // Arrête les timers actifs
+        if (timerId) {
+            clearInterval(timerId);
+            timerId = null;
+        }
+        if (heartbeatIntervalId) {
+            clearInterval(heartbeatIntervalId);
+            heartbeatIntervalId = null;
+        }
+
+        // Retire les écouteurs
+        window.removeEventListener('beforeunload', saveBeforeUnload);
+
+        // Réinitialise les données
+        currentSession.value = null;
+        currentPart.value = null;
+        currentPauseId.value = null;
+        remainingTime.value = 0;
+        isPaused.value = false;
+        isTimerRunning.value = false;
+        isLoading.value = false;
+    }
 
     async function createNextSessionPart() {
         if (!currentSession.value) return;
@@ -258,5 +281,6 @@ export function useSessionRunner(userId: Ref<string>) {
         skipCurrentPart,
         cancelCurrentSession,
         loadCurrentSession,
+        stop
     };
 }
