@@ -87,8 +87,10 @@ const showConfirm = ref<boolean>(false);
         </div>
         <div class="form-element vertical">
           <label>Account creation:</label>
-          <span style="padding-left: 20px; font-weight: bold">{{ createdAt }} </span>
-          <span v-if="daysSinceCreation">({{ daysSinceCreation }} day(s) ago)</span>
+          <div class="flex align-center col-gap-8">
+            <span style="padding-left: 20px; font-weight: bold">{{ createdAt }} </span>
+            <span style="font-size: 12px; opacity: .75; font-style: italic" v-if="daysSinceCreation">({{ daysSinceCreation }} day(s) ago)</span>
+          </div>
         </div>
       </div>
     </Fieldset>

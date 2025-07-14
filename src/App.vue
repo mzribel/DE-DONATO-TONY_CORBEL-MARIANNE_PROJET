@@ -1,21 +1,53 @@
 <script setup lang="ts">
-import { provide } from 'vue';
-// Services
+import { provide, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+
 import { useAuth } from './composables/useAuth';
-// PrimeVue
-import Avatar from "primevue/avatar";
+import { useSettings } from './composables/useSettings';
+import { useSessionRunner } from './composables/useSessionRunner';
+
 import Button from "primevue/button"
+import Avatar from "primevue/avatar"
 
-// Authentification
-const { authState, isAuthenticated, userId, sessionRunner } = useAuth();
-// useAuth().setupRecoveryListener();
+const router = useRouter();
 
-// Variables globales
+// Auth
+const { authState, isAuthenticated, userId, init: initAuth } = useAuth();
 provide('authState', authState);
 provide('userId', userId);
+
+// Settings (uniquement les données)
+const settingsModule = useSettings();
+provide('settings', settingsModule.settings);
+
+// SessionRunner
+const sessionRunner = ref<ReturnType<typeof useSessionRunner> | null>(null);
 provide('sessionRunner', sessionRunner);
 
-console.log(authState, userId)
+// Initialisation
+onMounted(async () => {
+  await initAuth(); // récupère la session Supabase (si existante)
+
+  if (isAuthenticated.value) {
+    await settingsModule.loadSettings();
+
+    sessionRunner.value = useSessionRunner(userId);
+    await sessionRunner.value.loadCurrentSession();
+  }
+});
+
+// Reset le sessionRunner si déconnexion
+watch(userId, async (id) => {
+  if (!id) {
+    sessionRunner.value?.stop();
+    sessionRunner.value = null;
+  } else {
+    // Reconnexion => recharger session
+    await settingsModule.loadSettings();
+    sessionRunner.value = useSessionRunner(userId);
+    await sessionRunner.value.loadCurrentSession();
+  }
+});
 </script>
 
 <template>

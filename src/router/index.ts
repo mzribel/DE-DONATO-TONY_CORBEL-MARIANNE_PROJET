@@ -3,16 +3,15 @@ import { getSession } from '../services/supabase/authService';
 
 import SettingsView from "../views/SettingsView.vue";
 import HistoryView from "../views/HistoryView.vue";
-import TimerView from "../views/TimerView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import Signup from "../views/Auth/Signup.vue";
 import Login from "../views/Auth/Login.vue";
-import ResetPassword from "../views/Auth/ResetPassword.vue";
+import TimerView from "../views/TimerView.vue";
 
 const routes = [
     {
-        path: '/settings', 
-        name: "Settings", 
+        path: '/settings',
+        name: "Settings",
         component: SettingsView,
         meta: { requiresAuth: true }
     },
@@ -22,9 +21,9 @@ const routes = [
         component: TimerView,
         meta: { requiresAuth: true }
     },
-    { 
-        path: '/history', 
-        name: "History", 
+    {
+        path: '/history',
+        name: "History",
         component: HistoryView,
         meta: { requiresAuth: true }
     },
@@ -38,17 +37,18 @@ const routes = [
         name: "Signup", 
         component: Signup,
     },
-    { 
-        path: '/profile', 
-        name: "Profile", 
+
+    {
+        path: '/profile',
+        name: "Profile",
         component: ProfileView,
         meta: { requiresAuth: true }
     },
-    {
-        path: '/reset-password',
-        name: "ResetPassword",
-        component: ResetPassword
-    }
+    // {
+    //     path: '/reset-password',
+    //     name: "ResetPassword",
+    //     component: ResetPassword
+    // }
 ]
 
 export const router = createRouter({

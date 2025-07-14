@@ -6,6 +6,7 @@ import PrimeVue from "primevue/config";
 // @ts-ignore
 import Aura from '@primeuix/themes/aura';
 import {definePreset} from "@primeuix/themes";
+
 const MyPreset = definePreset(Aura, {
     semantic: {
         primary: {
@@ -24,7 +25,7 @@ const MyPreset = definePreset(Aura, {
     }
 });
 
-const app = createApp(App)
+createApp(App)
     .use(router)
     .use(PrimeVue, {
         theme: {

@@ -1,4 +1,4 @@
-import {ref, computed, onBeforeUnmount, Ref, ComputedRef} from 'vue';
+import {ref, computed, Ref, ComputedRef} from 'vue';
 import { sessionsService } from '../services/supabase/newSessionService';
 import { Session, SessionPart } from '../types/sessions';
 
@@ -136,14 +136,12 @@ export function useSessionRunner(userId: Ref<string> | ComputedRef<string>) {
     }
 
     async function skipCurrentPart() {
-        console.log("?")
         if (!currentPart.value) return;
         stopTimer();
         if (currentPauseId) {
             await sessionsService.endPause(currentPauseId.value);
             currentPauseId.value = null;
         }
-        console.log(remainingTime.value);
         await sessionsService.skipSessionPart(currentPart.value.id, remainingTime.value);
         await createNextSessionPart();
     }

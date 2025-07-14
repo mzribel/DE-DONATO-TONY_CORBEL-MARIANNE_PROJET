@@ -20,7 +20,6 @@ export async function getSettings(userId: string): Promise<Settings | null> {
 }
 
 export async function updateSettings(newSettings: Partial<Settings>, userId: string): Promise<Settings | null> {
-    console.log(newSettings)
     const { data, error } = await supabase
         .from('user_settings')
         .update(newSettings)

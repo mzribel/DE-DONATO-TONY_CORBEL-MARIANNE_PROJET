@@ -28,7 +28,7 @@ const handleSubmit = async () => {
   try {
     const data = await authService.signInWithEmail(email.value, password.value);
 
-    authState.value.session = data.session;
+    authState.value.authSession = data.session;
     authState.value.user = {
       id: data.user.id,
       email: data.user.email ?? '',
