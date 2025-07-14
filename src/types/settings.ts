@@ -7,5 +7,6 @@ export type Settings = {
     cycles_before_long_break: number,
     notifications_enabled: boolean,
     sound_enabled: boolean,
-    auto_start_next: boolean
+    auto_start_next: boolean,
+    ringtone_id:number
 }

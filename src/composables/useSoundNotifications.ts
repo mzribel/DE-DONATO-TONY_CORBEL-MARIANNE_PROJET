@@ -1,21 +1,22 @@
 import { Ref, isRef } from 'vue';
 
-export function useSoundNotification(enableSound: Ref<boolean> | boolean, filename="sounds/notification.mp3") {
-    const sound_path = "/"
-    // Créer l'élément audio une seule fois
-    const audio = new Audio(sound_path+filename);
+export function useSoundNotification(file: string | Ref<string>, enableSound: Ref<boolean> | boolean) {
+    let audio: HTMLAudioElement | null = null;
 
     function playSound() {
+        const path = isRef(file) ? file.value : file;
         const enabled = isRef(enableSound) ? enableSound.value : enableSound;
-        if (!enabled) {
-            console.log('Son désactivé, pas de son joué.');
-            return;
+
+        if (!enabled) return;
+
+        // Si un son est déjà en cours, on l'arrête avant d'en jouer un nouveau
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
         }
 
-        audio.currentTime = 0; // recommence le son
-        audio.play().catch((err) => {
-            console.error('Erreur lecture audio :', err);
-        });
+        audio = new Audio(path);
+        audio.play().catch((err) => console.error('Erreur audio', err));
     }
 
     return { playSound };

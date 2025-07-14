@@ -41,12 +41,7 @@ function onCancel() {
 </template>
 
 <style scoped>
-.button-group {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
+
 .dialog-content {
   display: flex;
   flex-direction: column;

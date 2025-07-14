@@ -13,6 +13,10 @@ import Button from 'primevue/button';
 import ToggleSwitch from "primevue/toggleswitch";
 import FieldSet from "primevue/fieldset";
 import ProgressSpinner from "primevue/progressspinner";
+import Dialog from "primevue/dialog"
+import DataTable from "primevue/datatable"
+import Column from 'primevue/column';
+import { ringtones } from "../types/ringtones";
 
 const {
   localSettings,
@@ -30,6 +34,8 @@ onMounted(() => {
   loadSettings(userId.value);
 });
 
+const modalVisible = ref(false);
+
 const showConfirm = ref(false);
 const userId = inject('userId') as Ref<string>;
 
@@ -40,9 +46,31 @@ const sendTestNotification = () => {
 }
 
 const enableSound = computed(() => settings.value?.sound_enabled ?? false);
-const { playSound } = useSoundNotification(enableSound, "sounds/test_sound.mp3");
+const { playSound } = useSoundNotification("sounds/test_sound.mp3", enableSound);
 const playTestSound = () => {
   playSound();
+}
+
+const selectedRingtone = ref<typeof ringtones[0]>(ringtones[0]);
+
+let previewAudio: HTMLAudioElement | null = null;
+
+function playPreview(file: string) {
+  if (previewAudio) {
+    previewAudio.pause();
+    previewAudio.currentTime = 0;
+  }
+
+  previewAudio = new Audio(file);
+  previewAudio.play().catch(err => console.error("Playback error:", err));
+}
+
+// Validation
+function confirmSelection() {
+  if (!selectedRingtone.value) return;
+
+  settings.value.ringtone_id = selectedRingtone.value.id;
+  modalVisible.value = false;
 }
 </script>
 
@@ -96,6 +124,16 @@ const playTestSound = () => {
               <ToggleSwitch v-model="localSettings.sound_enabled"/>
             </div>
           </div>
+          <div class="form-element col">
+            <label for="">Preferred ringone</label>
+            <Button
+              @click="modalVisible = true"
+              :label="selectedRingtone?.name || 'Choose a ringtone'"
+              variant="outlined"
+              severity="secondary"
+              class="ringtone-btn"
+            />
+          </div>
           <div class="form-element justify-between align-center">
             <div>
               <label for="">Timer end notification</label>
@@ -114,11 +152,44 @@ const playTestSound = () => {
         <Button icon="pi pi-check" label="Save" @click="saveChanges(userId)" :disabled="!hasChanged" :loading="saving"/>
       </div>
     </div>
+  <Dialog v-model:visible="modalVisible" modal header="Choose a ringtone" class="ringtone-modal">
+      <DataTable
+        v-model:selection="selectedRingtone"
+        :value="ringtones"
+        selection-mode="single"
+        dataKey="id"
+      >
+        <Column field="name" header="Name"></Column>
+        <Column header="Play">
+          <template #body="{ data }">
+            <div class="flex justify-end">
+              <Button
+                icon="pi pi-volume-up"
+                rounded
+                size="small"
+                variant="outlined"
+                severity="contrast"
+                @click="playPreview(data.file)"
+              />
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+    <div class="button-group justify-end">
+      <Button icon="pi pi-times" type="button" label="Cancel" severity="secondary" size="medium" @click="modalVisible = false" />
+      <Button
+        icon="pi pi-check"
+        type="button"
+        label="Confirm"
+        severity="danger"
+        size="medium"
+        @click="confirmSelection"
+      />
+    </div>
+  </Dialog>
 </template>
 
 <style>
-
-
 .button-bar {
   display: flex;
   align-items: center;
@@ -129,8 +200,22 @@ const playTestSound = () => {
 h1, h2{
   margin: 0;
 }
-
+thead {
+  display: none;
+}
 .p-progressspinner-circle {
   animation: p-progressspinner-dash 1.5s ease-in-out infinite !important;
+}
+.ringtone-btn {
+  justify-content: flex-start !important;
+}
+.ringtone-modal {
+  width: min(600px, 95%);
+
+}
+.ringtone-modal .p-dialog-content {
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
 }
 </style>
