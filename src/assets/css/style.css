@@ -1,0 +1,69 @@
+@import "../../../node_modules/primeicons/primeicons.css";
+@import "forms.css";
+@import "auth.css";
+
+:root {
+  font-family: "Nunito Sans", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: unset;
+  text-decoration: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding:0;
+  display: flex;
+  justify-content: center;
+  height:100%;
+  width: 100%;
+}
+
+.flex { display: flex; }
+.row  { flex-direction: row; }
+.col { flex-direction: column; }
+.flex-1 { flex:1 }
+
+.row-gap-8 { row-gap: 8px; }
+.row-gap-16 { row-gap: 16px; }
+.row-gap-24 { row-gap: 24px; }
+.row-gap-32 { row-gap: 32px; }
+
+.col-gap-8 { column-gap: 8px; }
+.col-gap-16 { column-gap: 16px; }
+.col-gap-24 { column-gap: 24px; }
+.col-gap-32 { column-gap: 32px; }
+
+.align-center { align-items: center; }
+.align-start { align-items: center; }
+.align-end { align-items: center; }
+
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between ; }
+
+.container {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: unset !important;
+}
+h1, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}

@@ -1,6 +1,5 @@
 import { supabase } from './client';
-import {Session} from "../../types/Session";
-import {AuthSession} from "@supabase/supabase-js";
+import { AuthSession } from "@supabase/supabase-js";
 
 export async function signInWithEmail(email: string, password: string) {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -36,3 +35,15 @@ export function onAuthStateChange(callback: (event: string, session: AuthSession
         callback(event, session);
     });
 }
+
+export async function resetPassword(email:string) {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'pomodoro://auth-callback',
+    })
+    if (error) console.error(error);
+    return data;
+}
+
+export const updatePassword = async (newPassword: string) => {
+    return await supabase.auth.updateUser({ password: newPassword });
+};

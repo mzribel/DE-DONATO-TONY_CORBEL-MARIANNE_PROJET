@@ -13,6 +13,9 @@ import { contextBridge, ipcRenderer } from 'electron';
  */
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    // Notifications
     notify: (title: string, body: string) => ipcRenderer.invoke('notify', { title, body }),
+    onRecoveryToken: (callback: (token: string) => void) => {
+        ipcRenderer.on('recovery-token', (_event, token) => callback(token));
+    },
+    deleteAccount: (token: string) => ipcRenderer.invoke('delete-account', token),
 });

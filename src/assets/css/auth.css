@@ -1,0 +1,9 @@
+.auth-link {
+    margin-top: 24px;
+    opacity: 80%;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-style: italic;
+    font-size: 15px;
+    text-align: center;
+}

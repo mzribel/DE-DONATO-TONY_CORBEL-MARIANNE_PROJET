@@ -1,24 +1,23 @@
 import { ref } from "vue";
+import * as SettingsService from "../services/supabase/settingsService";
+import { Settings } from "../types/settings";
 
 const settings = ref(null);
 const loading = ref(false);
 
-import * as SettingsService from "../services/supabase/settingsService"
-import {Settings} from "../types/Settings";
-
 export function useSettings() {
-    async function loadSettings():Promise<void> {
+    async function loadSettings(userId:string):Promise<void> {
         loading.value = true;
-        settings.value = await SettingsService.getSettings();
+        settings.value = await SettingsService.getSettings(userId);
         loading.value = false;
     }
 
-    async function updateSettings(newSettings:Partial<Settings>):Promise<void> {
-        settings.value = await SettingsService.updateSettings(newSettings);
+    async function updateSettings(newSettings:Partial<Settings>, userId:string):Promise<void> {
+        settings.value = await SettingsService.updateSettings(newSettings, userId);
     }
 
-    async function resetSettings():Promise<void> {
-        settings.value = await SettingsService.resetSettings();
+    async function resetSettings(userId:string):Promise<void> {
+        settings.value = await SettingsService.resetSettings(userId);
     }
 
     return {

@@ -1,50 +1,53 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { getSession } from '../services/supabase/authService';
 
-import HomeView from "../views/HomeView.vue";
 import SettingsView from "../views/SettingsView.vue";
-import PomodoroTimerView from "../views/PomodoroTimerView.vue";
-import SessionHistoryView from "../views/SessionHistoryView.vue";
-import Auth from "../views/Auth/Auth.vue";
+import HistoryView from "../views/HistoryView.vue";
+import TimerView from "../views/TimerView.vue";
+import ProfileView from "../views/ProfileView.vue";
+import Signup from "../views/Auth/Signup.vue";
+import Login from "../views/Auth/Login.vue";
+import ResetPassword from "../views/Auth/ResetPassword.vue";
 
 const routes = [
-    { path: '/', name: "Home", component: HomeView },
-    { 
+    {
         path: '/settings', 
         name: "Settings", 
         component: SettingsView,
         meta: { requiresAuth: true }
     },
     { 
-        path: '/pomodoro', 
+        path: '/',
         name: "Pomodoro", 
-        component: PomodoroTimerView,
+        component: TimerView,
         meta: { requiresAuth: true }
     },
     { 
         path: '/history', 
         name: "History", 
-        component: SessionHistoryView,
+        component: HistoryView,
         meta: { requiresAuth: true }
     },
     { 
         path: '/login', 
         name: "Login", 
-        component: Auth,
-        props: { activeTab: 'login' }
+        component: Login,
     },
     { 
         path: '/signup', 
         name: "Signup", 
-        component: Auth,
-        props: { activeTab: 'signup' }
+        component: Signup,
     },
     { 
         path: '/profile', 
         name: "Profile", 
-        component: Auth,
-        props: { activeTab: 'profile' },
+        component: ProfileView,
         meta: { requiresAuth: true }
+    },
+    {
+        path: '/reset-password',
+        name: "ResetPassword",
+        component: ResetPassword
     }
 ]
 
@@ -56,13 +59,13 @@ export const router = createRouter({
 
 // Protection des routes
 router.beforeEach(async (to, from, next) => {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
-        const data = await getSession();
-        if (!data?.session) {
-            next({ name: 'Login' });
-        } else {
-            next();
-        }
+    const session = await getSession();
+    const isAuthenticated = !!session?.session;
+
+    if (to.meta.requiresAuth && !isAuthenticated) {
+        next('/login');
+    } else if ((to.path === '/login' || to.path === '/signup') && isAuthenticated) {
+        next('/');
     } else {
         next();
     }
