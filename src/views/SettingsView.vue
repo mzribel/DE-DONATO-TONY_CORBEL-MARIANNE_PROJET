@@ -17,18 +17,19 @@ import Dialog from "primevue/dialog"
 import DataTable from "primevue/datatable"
 import Column from 'primevue/column';
 import { ringtones } from "../types/ringtones";
+import {Settings} from "../types/settings";
 
+const settings = inject('settings') as Ref<Settings | null>;
 const {
   localSettings,
-  settings,
-  loading,
-  saving,
-  hasChanged,
   loadSettings,
   saveChanges,
+  hasChanged,
   cancelChanges,
-  resetSettings
-} = useSettingsForm();
+  resetSettings,
+  loading,
+  saving
+} = useSettingsForm(settings);
 
 onMounted(() => {
   loadSettings(userId.value);
@@ -44,15 +45,20 @@ watch(modalVisible, (visible) => {
 const showConfirm = ref(false);
 const userId = inject('userId') as Ref<string>;
 
-const enableNotifications = computed(() => settings.value?.notifications_enabled ?? false);
-const { sendNotification } = useNotifications(enableNotifications);
-const sendTestNotification = () => {
-  sendNotification("Notification de test", "Ma mère en ski");
+// Variables de notification
+const selectedRingtone = ref<typeof ringtones[0]>(ringtones[0]); // la valeur effective
+const textNotificationEnabled = computed(()=>localSettings.value.notifications_enabled);
+const soundNotificationEnabled = computed(()=>localSettings.value.sound_enabled);
+const { sendNotification } = useNotifications(textNotificationEnabled);
+const { playSound } = useSoundNotification(localSettings.value.ringtone_id, soundNotificationEnabled);
+
+function sendTestNotification() {
+  if (localSettings.value.notifications_enabled) {
+    sendNotification("Test", "Ça fonctionne !");
+  }
+  playSound();
 }
 
-const enableSound = computed(() => settings.value?.sound_enabled ?? false);
-
-const selectedRingtone = ref<typeof ringtones[0]>(ringtones[0]); // la valeur effective
 watch(
   () => localSettings.value.ringtone_id,
   (newId) => {
@@ -145,7 +151,6 @@ function onSelectionChange(newSelection: typeof ringtones[0] | null) {
               <Message severity="secondary" variant="simple" size="small">Play a sound when the timer ends</Message>
             </div>
             <div class="form-element horizontal align-center">
-              <Button v-if="settings.sound_enabled" icon="pi pi-volume-up" rounded aria-label="Save" size="small" variant="outlined" severity="contrast"/>
               <ToggleSwitch v-model="localSettings.sound_enabled"/>
             </div>
           </div>

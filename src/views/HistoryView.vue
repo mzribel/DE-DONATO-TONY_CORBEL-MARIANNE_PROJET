@@ -47,6 +47,7 @@ function formatIsoDateTime(isoString: string) {
 
 function getTotalInterruptionDuration(session_part_pauses: any[]): number {
   if (!session_part_pauses) return 0;
+
   const total = session_part_pauses.reduce((total, pause) => {
     if (pause.started_at && pause.ended_at) {
       const start = new Date(pause.started_at).getTime();
@@ -54,7 +55,9 @@ function getTotalInterruptionDuration(session_part_pauses: any[]): number {
       const durationSec = (end - start) / 1000;
       return total + durationSec;
     }
+    return total; // <-- on retourne la valeur d'accumulation si la pause est incomplète
   }, 0);
+
   return Math.round(total);
 }
 
